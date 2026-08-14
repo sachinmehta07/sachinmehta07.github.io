@@ -3,10 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="GhGLDiOpfZDJmHpFCC62HiwjPW_sd359HZPy6qdgUz4" />
-    <title>BuiltFirst Labs</title>
+    <title>BuiltFirstLabs | Solve Real Problems</title>
+    <style>
+        /* CSS Variables for Brand Theme */
+        :root {
+            --primary-blue: #1b5dec; /* Matched to your logo */
+            --primary-black: #111111;
+            --text-gray: #6e6e73;
+            --bg-color: #fbfbfd;
+            --white: #ffffff;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-black);
+            line-height: 1.4;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            background: rgba(251, 251, 253, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary-black);
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 30px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 40px;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 6vw, 80px);
+            letter-spacing: -0.02em;
+            font-weight: 700;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            color: var(--primary-blue);
+        }
+
+        .hero p {
+            font-size: clamp(20px, 3vw, 28px);
+            color: var(--text-gray);
+            max-width: 700px;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        /* Image Showcase */
+        .showcase-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .brand-header-img {
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            will-change: transform, opacity;
+        }
+
+        /* Features Section */
+        .features {
+            background-color: var(--white);
+            padding: 120px 20px;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 60px;
+        }
+
+        .feature-card {
+            text-align: left;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: var(--text-gray);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+            font-size: 14px;
+        }
+
+        /* --- JS Animation Classes --- */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delays for child elements */
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+    </style>
 </head>
 <body>
-    <h1>BuiltFirst Labs Coming Soon!</h1>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-logo">
+            <!-- Points to your GitHub Pages assets folder -->
+            <img src="./assets/brand_logo.png" alt="BuiltFirstLabs Logo">
+        </div>
+        <div class="nav-links">
+            <a href="#products">Products</a>
+            <a href="#about">Philosophy</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="reveal-up">Building simple,<br><span>zero-clutter</span> tools.</h1>
+        <p class="reveal-up delay-1">To solve real-world problems. No spam, no complex dashboards—just pure, fast functionality.</p>
+    </section>
+
+    <!-- Brand Header Image Showcase -->
+    <section class="showcase-container">
+        <!-- Points to your GitHub Pages assets folder -->
+        <img src="./assets/brand_header_img.jpg" alt="BuiltFirstLabs Brand Header" class="brand-header-img reveal-up delay-2">
+    </section>
+
+    <!-- Core Pillars Section -->
+    <section class="features" id="about">
+        <div class="features-grid">
+            <div class="feature-card reveal-up">
+                <div class="feature-icon">⚡</div>
+                <h3>Solve Real Problems</h3>
+                <p>We don't build software just to build software. We focus on upgrading existing workflows and improving efficiency without forcing steep learning curves.</p>
+            </div>
+            <div class="feature-card reveal-up delay-1">
+                <div class="feature-icon">🛡️</div>
+                <h3>Reliable & Secure</h3>
+                <p>Zero cloud required. Our tools are built strictly for offline-first reliability, ensuring your business data stays 100% private on your own device.</p>
+            </div>
+            <div class="feature-card reveal-up delay-2">
+                <div class="feature-icon">📱</div>
+                <h3>Made for Everyday Use</h3>
+                <p>No bloated subscriptions or overwhelming settings. We design frictionless UIs that get out of your way so you can get back to running your business.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; <script>document.write(new Date().getFullYear())</script> BuiltFirstLabs. Build Apps. Solve Real Problems.</p>
+    </footer>
+
+    <!-- Intersection Observer for Smooth Scroll Animations -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15 // Triggers when 15% of the element is visible
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: Stop observing once animated in
+                        // observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Target all elements with the reveal-up class
+            const revealElements = document.querySelectorAll('.reveal-up');
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
 </body>
 </html>
