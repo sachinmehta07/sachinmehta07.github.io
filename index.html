@@ -177,8 +177,8 @@
     <!-- Navigation -->
     <nav>
         <div class="nav-logo">
-            <!-- Points to your GitHub Pages assets folder -->
-            <img src="./assets/brand_logo.png" alt="BuiltFirstLabs Logo">
+            <!-- Using raw GitHub link so it loads from anywhere -->
+            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_logo.png" alt="BuiltFirstLabs Logo">
         </div>
         <div class="nav-links">
             <a href="#products">Products</a>
@@ -188,14 +188,14 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <h1 class="reveal-up">Building simple,<br><span>zero-clutter</span> tools.</h1>
-        <p class="reveal-up delay-1">To solve real world problems. No spam, no complex dashboards just pure, fast functionality.</p>
+        <h1 class="reveal-up">Building simple,<br><span>clean and easy</span> tools.</h1>
+        <p class="reveal-up delay-1">To solve real-world problems. No spam, no confusing screens—just pure, fast functionality.</p>
     </section>
 
     <!-- Brand Header Image Showcase -->
     <section class="showcase-container">
-        <!-- Points to your GitHub Pages assets folder -->
-        <img src="./assets/brand_header_img.jpg" alt="BuiltFirstLabs Brand Header" class="brand-header-img reveal-up delay-2">
+        <!-- Using raw GitHub link so it loads from anywhere -->
+        <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_header_img.png" alt="BuiltFirstLabs Brand Header" class="brand-header-img reveal-up delay-2">
     </section>
 
     <!-- Core Pillars Section -->
@@ -214,7 +214,7 @@
             <div class="feature-card reveal-up delay-2">
                 <div class="feature-icon">📱</div>
                 <h3>Made for Everyday Use</h3>
-                <p>No bloated subscriptions or overwhelming settings. We design frictionless UIs that get out of your way so you can get back to running your business.</p>
+                <p>No overwhelming settings. We design simple, easy-to-use interfaces that get out of your way so you can get back to running your business.</p>
             </div>
         </div>
     </section>
@@ -230,20 +230,17 @@
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
-                threshold: 0.15 // Triggers when 15% of the element is visible
+                threshold: 0.15 
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('active');
-                        // Optional: Stop observing once animated in
-                        // observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
 
-            // Target all elements with the reveal-up class
             const revealElements = document.querySelectorAll('.reveal-up');
             revealElements.forEach(el => observer.observe(el));
         });
