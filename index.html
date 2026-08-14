@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BuiltFirstLabs | Solve Real Problems</title>
+    <title>BuiltFirstLabs | Built Simple. Built to Solve.</title>
+    <meta name="description" content="BuiltFirstLabs builds offline-first software for small businesses — starting with EzyMember, a simple membership tracker for gyms, salons, and tutors. No clutter, no subscriptions, no learning curve.">
+    <meta property="og:title" content="BuiltFirstLabs | Built Simple. Built to Solve.">
+    <meta property="og:description" content="Offline-first software for small businesses. No clutter, no subscriptions, no learning curve.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_header_img.png">
+    <meta property="og:type" content="website">
     <style>
         /* CSS Variables for Brand Theme */
         :root {
@@ -111,6 +116,85 @@
             will-change: transform, opacity;
         }
 
+        /* Shared section intro (Products + Philosophy) */
+        .section-intro {
+            max-width: 680px;
+            margin: 0 auto 64px;
+            text-align: center;
+        }
+
+        .eyebrow {
+            display: block;
+            color: var(--primary-blue);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .section-intro h2 {
+            font-size: clamp(32px, 4.5vw, 48px);
+            letter-spacing: -0.02em;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-intro p {
+            color: var(--text-gray);
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .platform-badge {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 8px 18px;
+            background: rgba(27, 93, 236, 0.08);
+            color: var(--primary-blue);
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 999px;
+        }
+
+        /* Product Spotlight */
+        .product-spotlight {
+            padding: 70px 20px 100px;
+        }
+
+        .product-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 28px;
+        }
+
+        .product-card {
+            background: var(--white);
+            padding: 32px 28px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: left;
+        }
+
+        .product-card .feature-icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .product-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .product-card p {
+            color: var(--text-gray);
+            font-size: 14.5px;
+            line-height: 1.6;
+        }
+
         /* Features Section */
         .features {
             background-color: var(--white);
@@ -170,6 +254,7 @@
         .delay-1 { transition-delay: 0.1s; }
         .delay-2 { transition-delay: 0.2s; }
         .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
     </style>
 </head>
 <body>
@@ -188,40 +273,76 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <h1 class="reveal-up">Building simple,<br><span>clean and easy</span> tools.</h1>
-        <p class="reveal-up delay-1">To solve real-world problems. No spam, no confusing screens—just pure, fast functionality.</p>
+        <h1 class="reveal-up">Built simple. <span>Built to solve.</span></h1>
+        <p class="reveal-up delay-1">Offline-first apps for small businesses who want less software, and more time back in their day.</p>
     </section>
 
     <!-- Brand Header Image Showcase -->
     <section class="showcase-container">
         <!-- Using raw GitHub link so it loads from anywhere -->
-        <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_header_img.png" alt="BuiltFirstLabs Brand Header" class="brand-header-img reveal-up delay-2">
+        <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_header_img.png" alt="BuiltFirstLabs product showcase" class="brand-header-img reveal-up delay-2">
+    </section>
+
+    <!-- Product Spotlight: EzyMember -->
+    <section class="product-spotlight" id="products">
+        <div class="section-intro">
+            <span class="eyebrow reveal-up">Our Flagship App</span>
+            <h2 class="reveal-up delay-1">Meet EzyMember.</h2>
+            <p class="reveal-up delay-2">Membership tracking for gyms, salons, and tutors — built to replace the paper register, not your whole workflow.</p>
+            <span class="platform-badge reveal-up delay-3">Available for Android</span>
+        </div>
+        <div class="product-grid">
+            <div class="product-card reveal-up">
+                <div class="feature-icon">🔒</div>
+                <h3>100% Offline & Private</h3>
+                <p>No internet required, no third-party servers. Every record stays on your device, with automatic backups to your own Google Drive.</p>
+            </div>
+            <div class="product-card reveal-up delay-1">
+                <div class="feature-icon">⚡</div>
+                <h3>The 3-Click Rule</h3>
+                <p>Add a new member in two clicks. Renew, remind, or check status just as fast — nothing is ever buried in menus.</p>
+            </div>
+            <div class="product-card reveal-up delay-2">
+                <div class="feature-icon">💬</div>
+                <h3>One-Tap WhatsApp Reminders</h3>
+                <p>A polite, pre-written reminder with dates and dues, sent in a single tap. What took an hour now takes seconds.</p>
+            </div>
+            <div class="product-card reveal-up delay-3">
+                <div class="feature-icon">📊</div>
+                <h3>Staff-Safe Exports</h3>
+                <p>Hand off contact lists for follow-ups with revenue and dues hidden. Your numbers stay your business.</p>
+            </div>
+        </div>
     </section>
 
     <!-- Core Pillars Section -->
     <section class="features" id="about">
+        <div class="section-intro">
+            <span class="eyebrow reveal-up">Our Philosophy</span>
+            <h2 class="reveal-up delay-1">Why we build differently.</h2>
+        </div>
         <div class="features-grid">
             <div class="feature-card reveal-up">
                 <div class="feature-icon">⚡</div>
                 <h3>Solve Real Problems</h3>
-                <p>We don't build software just to build software. We focus on upgrading existing workflows and improving efficiency without forcing steep learning curves.</p>
+                <p>We don't build software for the sake of it. Every tool starts with something broken — a paper register, a manual reminder — and ends with something faster.</p>
             </div>
             <div class="feature-card reveal-up delay-1">
                 <div class="feature-icon">🛡️</div>
-                <h3>Reliable & Secure</h3>
-                <p>Zero cloud required. Our tools are built strictly for offline-first reliability, ensuring your business data stays 100% private on your own device.</p>
+                <h3>Private by Design</h3>
+                <p>No cloud required, no data harvesting, no fine print. Our apps run on your device, so your business stays exactly that: yours.</p>
             </div>
             <div class="feature-card reveal-up delay-2">
                 <div class="feature-icon">📱</div>
-                <h3>Made for Everyday Use</h3>
-                <p>No overwhelming settings. We design simple, easy-to-use interfaces that get out of your way so you can get back to running your business.</p>
+                <h3>Zero Learning Curve</h3>
+                <p>No onboarding screens, no manuals, no settings to dig through. Open the app, and you already know how to use it.</p>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; <script>document.write(new Date().getFullYear())</script> BuiltFirstLabs. Build Apps. Solve Real Problems.</p>
+        <p>&copy; <script>document.write(new Date().getFullYear())</script> BuiltFirstLabs. Built simple. Built to solve.</p>
     </footer>
 
     <!-- Intersection Observer for Smooth Scroll Animations -->
