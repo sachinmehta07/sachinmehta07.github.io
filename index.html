@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BuiltFirstLabs | Built Simple. Built to Solve.</title>
-    <meta name="description" content="BuiltFirstLabs builds offline-first software for small businesses — starting with EzyMember, a simple membership tracker for gyms, salons, and tutors. No clutter, no subscriptions, no learning curve.">
+    <meta name="description" content="BuiltFirstLabs builds simple software for small businesses — starting with EzyMember, an offline-first membership tracker for gyms, salons, and tutors. No clutter, no subscriptions, no learning curve.">
     <meta property="og:title" content="BuiltFirstLabs | Built Simple. Built to Solve.">
-    <meta property="og:description" content="Offline-first software for small businesses. No clutter, no subscriptions, no learning curve.">
+    <meta property="og:description" content="Simple software for small businesses, starting with EzyMember — an offline-first membership tracker with zero learning curve.">
     <meta property="og:image" content="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_header_img.png">
     <meta property="og:type" content="website">
     <style>
@@ -17,6 +17,7 @@
             --text-gray: #6e6e73;
             --bg-color: #fbfbfd;
             --white: #ffffff;
+            --ezymember-teal: #1F9787; /* EzyMember's own accent, scoped to its section only */
         }
 
         /* Reset & Base Styles */
@@ -40,7 +41,7 @@
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 20px 40px;
+            padding: 22px 44px;
             background: rgba(251, 251, 253, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -51,16 +52,17 @@
         }
 
         .nav-logo img {
-            height: 40px;
+            height: 52px;
             width: auto;
+            display: block;
         }
 
         .nav-links a {
             text-decoration: none;
             color: var(--primary-black);
-            font-size: 14px;
-            font-weight: 500;
-            margin-left: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-left: 32px;
             transition: color 0.3s ease;
         }
 
@@ -76,7 +78,16 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 120px 20px 40px;
+            padding: 140px 20px 40px;
+        }
+
+        .hero-kicker {
+            color: var(--primary-blue);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
         }
 
         .hero h1 {
@@ -119,7 +130,7 @@
         /* Shared section intro (Products + Philosophy) */
         .section-intro {
             max-width: 680px;
-            margin: 0 auto 64px;
+            margin: 0 auto 40px;
             text-align: center;
         }
 
@@ -131,6 +142,15 @@
             letter-spacing: 0.1em;
             text-transform: uppercase;
             margin-bottom: 16px;
+        }
+
+        /* EzyMember's own brand color — scoped so it never leaks outside its section */
+        .product-spotlight .eyebrow {
+            color: var(--ezymember-teal);
+        }
+
+        .ezymember-accent {
+            color: var(--ezymember-teal);
         }
 
         .section-intro h2 {
@@ -146,53 +166,128 @@
             font-weight: 500;
         }
 
-        .platform-badge {
-            display: inline-block;
-            margin-top: 24px;
-            padding: 8px 18px;
-            background: rgba(27, 93, 236, 0.08);
-            color: var(--primary-blue);
-            font-size: 13px;
+        /* CTA buttons */
+        .cta-row {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary-blue);
+            color: var(--white);
+            text-decoration: none;
+            font-size: 15px;
             font-weight: 600;
+            padding: 13px 26px;
             border-radius: 999px;
+            box-shadow: 0 8px 20px rgba(27, 93, 236, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(27, 93, 236, 0.32);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-black);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 13px 22px;
+            border-radius: 999px;
+            border: 1.5px solid rgba(17,17,17,0.14);
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .micro-note {
+            display: block;
+            margin-top: 20px;
+            color: var(--text-gray);
+            font-size: 13px;
+            font-weight: 500;
         }
 
         /* Product Spotlight */
         .product-spotlight {
-            padding: 70px 20px 100px;
+            padding: 70px 20px 110px;
         }
 
-        .product-grid {
+        .feature-showcase {
             max-width: 1100px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 28px;
+            margin: 90px auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 100px;
         }
 
-        .product-card {
-            background: var(--white);
-            padding: 32px 28px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: left;
+        .feature-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 32px;
         }
 
-        .product-card .feature-icon {
-            font-size: 28px;
-            margin-bottom: 16px;
+        .feature-copy {
+            max-width: 560px;
         }
 
-        .product-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
+        .feature-copy h3 {
+            font-size: clamp(24px, 3vw, 30px);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin: 8px 0 10px;
         }
 
-        .product-card p {
+        .feature-copy p {
             color: var(--text-gray);
-            font-size: 14.5px;
-            line-height: 1.6;
+            font-size: 16px;
+            line-height: 1.65;
+        }
+
+        .feature-visual {
+            width: 100%;
+            max-width: 850px;
+        }
+
+        .feature-visual img {
+            width: 100%;
+            display: block;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+
+        .feature-visual.dual {
+            max-width: 950px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .feature-visual.dual img {
+            width: calc(50% - 10px);
+        }
+
+        @media (max-width: 600px) {
+            .feature-visual.dual {
+                flex-direction: column;
+            }
+            .feature-visual.dual img {
+                width: 100%;
+            }
         }
 
         /* Features Section */
@@ -238,6 +333,20 @@
             font-size: 14px;
         }
 
+        .footer-sub {
+            margin-top: 10px;
+        }
+
+        .footer-sub a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-sub a:hover {
+            text-decoration: underline;
+        }
+
         /* --- JS Animation Classes --- */
         .reveal-up {
             opacity: 0;
@@ -263,7 +372,7 @@
     <nav>
         <div class="nav-logo">
             <!-- Using raw GitHub link so it loads from anywhere -->
-            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_logo.png" alt="BuiltFirstLabs Logo">
+            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/app_logo_no_bg.png" alt="BuiltFirstLabs Logo">
         </div>
         <div class="nav-links">
             <a href="#products">Products</a>
@@ -273,8 +382,9 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <h1 class="reveal-up">Built simple. <span>Built to solve.</span></h1>
-        <p class="reveal-up delay-1">Offline-first apps for small businesses who want less software, and more time back in their day.</p>
+        <p class="hero-kicker reveal-up">Simple • Fast • Private</p>
+        <h1 class="reveal-up delay-1">Built simple. <span>Built to solve.</span></h1>
+        <p class="reveal-up delay-2">Simple software for everyone — built to solve real problems, today and tomorrow.</p>
     </section>
 
     <!-- Brand Header Image Showcase -->
@@ -287,30 +397,52 @@
     <section class="product-spotlight" id="products">
         <div class="section-intro">
             <span class="eyebrow reveal-up">Our Flagship App</span>
-            <h2 class="reveal-up delay-1">Meet EzyMember.</h2>
+            <h2 class="reveal-up delay-1">Meet <span class="ezymember-accent">EzyMember</span>.</h2>
             <p class="reveal-up delay-2">Membership tracking for gyms, salons, and tutors — built to replace the paper register, not your whole workflow.</p>
-            <span class="platform-badge reveal-up delay-3">Available for Android</span>
+            <div class="cta-row reveal-up delay-3">
+                <a href="https://play.google.com/store/apps/details?id=com.builtfirst.ezymember" class="btn-primary" target="_blank" rel="noopener">Download on Google Play</a>
+                <a href="https://builtfirstlabs.com/ezymember-landing/" class="btn-secondary" target="_blank" rel="noopener">Visit EzyMember →</a>
+            </div>
+            <span class="micro-note reveal-up delay-4">Offline by default. Private by design.</span>
         </div>
-        <div class="product-grid">
-            <div class="product-card reveal-up">
-                <div class="feature-icon">🔒</div>
-                <h3>100% Offline & Private</h3>
-                <p>No internet required, no third-party servers. Every record stays on your device, with automatic backups to your own Google Drive.</p>
+
+        <div class="showcase-container">
+            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/ezymember_banner_img.png" alt="EzyMember app preview" class="brand-header-img reveal-up">
+        </div>
+
+        <div class="feature-showcase">
+            <div class="feature-row reveal-up">
+                <div class="feature-copy">
+                    <span class="eyebrow">Renewals</span>
+                    <h3>Find Expiring Members Faster</h3>
+                    <p>Members sort themselves into Active, Expiring Soon, and Expired — then filter by 1, 2, 3 weeks, or a month to see exactly who needs a follow-up.</p>
+                </div>
+                <div class="feature-visual dual">
+                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_1.png" alt="Filtering members by expiry timeline in EzyMember">
+                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_2.png" alt="List of expiring members in EzyMember">
+                </div>
             </div>
-            <div class="product-card reveal-up delay-1">
-                <div class="feature-icon">⚡</div>
-                <h3>The 3-Click Rule</h3>
-                <p>Add a new member in two clicks. Renew, remind, or check status just as fast — nothing is ever buried in menus.</p>
+
+            <div class="feature-row reveal-up">
+                <div class="feature-copy">
+                    <span class="eyebrow">Reminders</span>
+                    <h3>One-Click WhatsApp Reminders</h3>
+                    <p>Renewal reminders, expiry alerts, even welcome messages — every one pre-filled and ready. Preview, tweak if needed, and send in a single tap.</p>
+                </div>
+                <div class="feature-visual">
+                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_3.png" alt="WhatsApp reminder preview in EzyMember">
+                </div>
             </div>
-            <div class="product-card reveal-up delay-2">
-                <div class="feature-icon">💬</div>
-                <h3>One-Tap WhatsApp Reminders</h3>
-                <p>A polite, pre-written reminder with dates and dues, sent in a single tap. What took an hour now takes seconds.</p>
-            </div>
-            <div class="product-card reveal-up delay-3">
-                <div class="feature-icon">📊</div>
-                <h3>Staff-Safe Exports</h3>
-                <p>Hand off contact lists for follow-ups with revenue and dues hidden. Your numbers stay your business.</p>
+
+            <div class="feature-row reveal-up">
+                <div class="feature-copy">
+                    <span class="eyebrow">Exports</span>
+                    <h3>Complete, Privacy-Safe Exports</h3>
+                    <p>Export a member's full history — every plan, date, and payment — to PDF or Excel. Toggle financials off for staff-safe reports whenever they need to be shared.</p>
+                </div>
+                <div class="feature-visual">
+                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_4.png" alt="Privacy-safe export options in EzyMember">
+                </div>
             </div>
         </div>
     </section>
@@ -330,7 +462,7 @@
             <div class="feature-card reveal-up delay-1">
                 <div class="feature-icon">🛡️</div>
                 <h3>Private by Design</h3>
-                <p>No cloud required, no data harvesting, no fine print. Our apps run on your device, so your business stays exactly that: yours.</p>
+                <p>No data harvesting, no fine print, no selling your information. Whatever we build, your business stays exactly that: yours.</p>
             </div>
             <div class="feature-card reveal-up delay-2">
                 <div class="feature-icon">📱</div>
@@ -343,6 +475,7 @@
     <!-- Footer -->
     <footer>
         <p>&copy; <script>document.write(new Date().getFullYear())</script> BuiltFirstLabs. Built simple. Built to solve.</p>
+        <p class="footer-sub"><a href="https://play.google.com/store/apps/dev?id=6526007241164374603" target="_blank" rel="noopener">See all our apps on Google Play →</a></p>
     </footer>
 
     <!-- Intersection Observer for Smooth Scroll Animations -->
