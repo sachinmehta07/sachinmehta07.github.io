@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BuiltFirstLabs | Built Simple. Built to Solve.</title>
-    <meta name="description" content="BuiltFirstLabs builds simple software for small businesses — starting with EzyMember, an offline-first membership tracker for gyms, salons, and tutors. No clutter, no subscriptions, no learning curve.">
-    <meta property="og:title" content="BuiltFirstLabs | Built Simple. Built to Solve.">
-    <meta property="og:description" content="Simple software for small businesses, starting with EzyMember — an offline-first membership tracker with zero learning curve.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_header_img.png">
+    <title>BuiltFirstLabs | We Don't Pick Industries. We Pick Problems.</title>
+    <meta name="description" content="BuiltFirstLabs is a product company that finds ground-level problems software keeps overcomplicating, and fixes them with tools so simple they disappear. Product 01: EzyMember, an offline-first membership tracker for gyms, tutors, and salons.">
+    <meta property="og:title" content="BuiltFirstLabs | We Don't Pick Industries. We Pick Problems.">
+    <meta property="og:description" content="A product company that finds ground-level problems software overcomplicates, and fixes them with tools so simple they disappear.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/ezymember_banner_img.png">
     <meta property="og:type" content="website">
     <style>
         /* CSS Variables for Brand Theme */
@@ -78,23 +78,14 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 140px 20px 40px;
-        }
-
-        .hero-kicker {
-            color: var(--primary-blue);
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            margin-bottom: 18px;
+            padding: 140px 20px 60px;
         }
 
         .hero h1 {
-            font-size: clamp(40px, 6vw, 80px);
+            font-size: clamp(38px, 5.5vw, 72px);
             letter-spacing: -0.02em;
             font-weight: 700;
-            max-width: 900px;
+            max-width: 920px;
             margin-bottom: 20px;
         }
 
@@ -103,19 +94,33 @@
         }
 
         .hero p {
-            font-size: clamp(20px, 3vw, 28px);
+            font-size: clamp(20px, 3vw, 26px);
             color: var(--text-gray);
-            max-width: 700px;
-            margin-bottom: 40px;
+            max-width: 600px;
+            margin-bottom: 36px;
             font-weight: 500;
         }
 
-        /* Image Showcase */
+        .scroll-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .scroll-cta:hover {
+            text-decoration: underline;
+        }
+
+        /* Image Showcase (reused for the Product 01 visual) */
         .showcase-container {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 40px 20px 0;
             text-align: center;
         }
 
@@ -127,7 +132,40 @@
             will-change: transform, opacity;
         }
 
-        /* Shared section intro (Products + Philosophy) */
+        /* Why We Exist */
+        .our-story {
+            background: var(--white);
+            padding: 120px 20px;
+        }
+
+        .story-content {
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .story-content h2 {
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            margin: 16px 0 28px;
+        }
+
+        .story-content p {
+            color: var(--text-gray);
+            font-size: 17px;
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+
+        .story-content p.positioning-line {
+            color: var(--primary-black);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Shared centered section intro (How We Build + Product 01) */
         .section-intro {
             max-width: 680px;
             margin: 0 auto 40px;
@@ -144,15 +182,6 @@
             margin-bottom: 16px;
         }
 
-        /* EzyMember's own brand color — scoped so it never leaks outside its section */
-        .product-spotlight .eyebrow {
-            color: var(--ezymember-teal);
-        }
-
-        .ezymember-accent {
-            color: var(--ezymember-teal);
-        }
-
         .section-intro h2 {
             font-size: clamp(32px, 4.5vw, 48px);
             letter-spacing: -0.02em;
@@ -166,14 +195,77 @@
             font-weight: 500;
         }
 
-        /* CTA buttons */
-        .cta-row {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 28px;
+        /* How We Build */
+        .how-we-build {
+            padding: 120px 20px;
+        }
+
+        .method-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 60px;
+        }
+
+        .method-card {
+            text-align: left;
+        }
+
+        .method-number {
+            display: block;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+
+        .method-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .method-card p {
+            color: var(--text-gray);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Product 01 */
+        .product-spotlight {
+            background: var(--white);
+            padding: 120px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-number {
+            position: absolute;
+            top: 10px;
+            right: 30px;
+            font-size: 220px;
+            font-weight: 800;
+            color: rgba(31, 151, 135, 0.06);
+            line-height: 1;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* EzyMember's own brand color — scoped so it never leaks outside its section */
+        .product-spotlight .eyebrow {
+            color: var(--ezymember-teal);
+        }
+
+        .ezymember-accent {
+            color: var(--ezymember-teal);
+        }
+
+        .product-spotlight .section-intro,
+        .product-spotlight .showcase-container {
+            position: relative;
+            z-index: 1;
         }
 
         .btn-primary {
@@ -186,6 +278,7 @@
             font-weight: 600;
             padding: 13px 26px;
             border-radius: 999px;
+            margin-top: 16px;
             box-shadow: 0 8px 20px rgba(27, 93, 236, 0.25);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -195,134 +288,53 @@
             box-shadow: 0 12px 24px rgba(27, 93, 236, 0.32);
         }
 
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            color: var(--primary-black);
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 600;
-            padding: 13px 22px;
-            border-radius: 999px;
-            border: 1.5px solid rgba(17,17,17,0.14);
-            transition: border-color 0.2s ease, color 0.2s ease;
+        /* Closing CTA */
+        .closing-cta {
+            background: var(--primary-blue);
+            padding: 110px 20px;
+            text-align: center;
         }
 
-        .btn-secondary:hover {
-            border-color: var(--primary-blue);
+        .closing-cta h2 {
+            color: var(--white);
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 32px;
+        }
+
+        .btn-inverted {
+            display: inline-flex;
+            align-items: center;
+            background: var(--white);
             color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 15px 32px;
+            border-radius: 999px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+        }
+
+        .btn-inverted:hover {
+            transform: translateY(-2px);
         }
 
         .micro-note {
             display: block;
-            margin-top: 20px;
+            margin-top: 24px;
             color: var(--text-gray);
             font-size: 13px;
             font-weight: 500;
         }
 
-        /* Product Spotlight */
-        .product-spotlight {
-            padding: 70px 20px 110px;
+        .closing-cta .micro-note {
+            color: rgba(255,255,255,0.75);
         }
 
-        .feature-showcase {
-            max-width: 1100px;
-            margin: 90px auto 0;
-            display: flex;
-            flex-direction: column;
-            gap: 100px;
-        }
-
-        .feature-row {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 32px;
-        }
-
-        .feature-copy {
-            max-width: 560px;
-        }
-
-        .feature-copy h3 {
-            font-size: clamp(24px, 3vw, 30px);
-            font-weight: 700;
-            letter-spacing: -0.01em;
-            margin: 8px 0 10px;
-        }
-
-        .feature-copy p {
-            color: var(--text-gray);
-            font-size: 16px;
-            line-height: 1.65;
-        }
-
-        .feature-visual {
-            width: 100%;
-            max-width: 850px;
-        }
-
-        .feature-visual img {
-            width: 100%;
-            display: block;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-        }
-
-        .feature-visual.dual {
-            max-width: 950px;
-            display: flex;
-            gap: 20px;
-        }
-
-        .feature-visual.dual img {
-            width: calc(50% - 10px);
-        }
-
-        @media (max-width: 600px) {
-            .feature-visual.dual {
-                flex-direction: column;
-            }
-            .feature-visual.dual img {
-                width: 100%;
-            }
-        }
-
-        /* Features Section */
-        .features {
-            background-color: var(--white);
-            padding: 120px 20px;
-        }
-
-        .features-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 60px;
-        }
-
-        .feature-card {
-            text-align: left;
-        }
-
-        .feature-icon {
-            font-size: 32px;
-            color: var(--primary-blue);
-            margin-bottom: 20px;
-        }
-
-        .feature-card h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .feature-card p {
-            color: var(--text-gray);
-            font-size: 16px;
-            line-height: 1.6;
+        .closing-cta .micro-note a {
+            color: var(--white);
         }
 
         /* Footer */
@@ -359,7 +371,6 @@
             transform: translateY(0);
         }
 
-        /* Staggered delays for child elements */
         .delay-1 { transition-delay: 0.1s; }
         .delay-2 { transition-delay: 0.2s; }
         .delay-3 { transition-delay: 0.3s; }
@@ -372,109 +383,82 @@
     <nav>
         <div class="nav-logo">
             <!-- Using raw GitHub link so it loads from anywhere -->
-            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_logo.png" alt="BuiltFirstLabs Logo">
+            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/app_logo_no_bg.png" alt="BuiltFirstLabs Logo">
         </div>
         <div class="nav-links">
-            <a href="#products">Products</a>
-            <a href="#about">Philosophy</a>
+            <a href="#story">Our Story</a>
+            <a href="#how-we-build">How We Build</a>
+            <a href="#product">Product 01</a>
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero -->
     <section class="hero">
-        <p class="hero-kicker reveal-up">Simple • Fast • Private</p>
-        <h1 class="reveal-up delay-1">Built simple. <span>Built to solve.</span></h1>
-        <p class="reveal-up delay-2">Simple software for everyone — built to solve real problems, today and tomorrow.</p>
+        <h1 class="reveal-up">We don't pick industries. <span>We pick problems.</span></h1>
+        <p class="reveal-up delay-1">One small problem at a time. Everywhere.</p>
+        <a href="#product" class="scroll-cta reveal-up delay-2">See Product 01 ↓</a>
     </section>
 
-    <!-- Brand Header Image Showcase -->
-    <section class="showcase-container">
-        <!-- Using raw GitHub link so it loads from anywhere -->
-        <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/brand_header_img.png" alt="BuiltFirstLabs product showcase" class="brand-header-img reveal-up delay-2">
+    <!-- Why We Exist -->
+    <section class="our-story" id="story">
+        <div class="story-content">
+            <span class="eyebrow reveal-up">Why We Exist</span>
+            <h2 class="reveal-up delay-1">We find the ground-level problems software keeps overcomplicating — and fix them with tools so simple they disappear.</h2>
+            <p class="reveal-up delay-2">It started with a trainer, a paper register, and no good option. Our founder — an independent Android developer — watched a gym owner choose between a register he'd outgrown and software he couldn't afford or train his staff to use.</p>
+            <p class="reveal-up delay-3">That gap didn't just become EzyMember. It became how we build everything: we don't start by picking an industry. We start with someone stuck between a bad habit and no good tool.</p>
+            <p class="reveal-up delay-4 positioning-line">We build our own products. We don't build apps for hire.</p>
+        </div>
     </section>
 
-    <!-- Product Spotlight: EzyMember -->
-    <section class="product-spotlight" id="products">
+    <!-- How We Build -->
+    <section class="how-we-build" id="how-we-build">
         <div class="section-intro">
-            <span class="eyebrow reveal-up">Our Flagship App</span>
+            <span class="eyebrow reveal-up">How We Build</span>
+            <h2 class="reveal-up delay-1">The filter every idea has to pass.</h2>
+        </div>
+        <div class="method-grid">
+            <div class="method-card reveal-up">
+                <span class="method-number">01</span>
+                <h3>Find It on the Ground</h3>
+                <p>Not in a trend report. Every product starts from a real, directly observed problem.</p>
+            </div>
+            <div class="method-card reveal-up delay-1">
+                <span class="method-number">02</span>
+                <h3>Build the Smallest Thing</h3>
+                <p>The smallest thing that removes it — offline-first, minimal taps, zero training required.</p>
+            </div>
+            <div class="method-card reveal-up delay-2">
+                <span class="method-number">03</span>
+                <h3>Earn Adoption First</h3>
+                <p>Impact comes first, monetization follows — never the other way around.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product 01: EzyMember -->
+    <section class="product-spotlight" id="product">
+        <span class="section-number">01</span>
+        <div class="section-intro">
+            <span class="eyebrow reveal-up">Product 01</span>
             <h2 class="reveal-up delay-1">Meet <span class="ezymember-accent">EzyMember</span>.</h2>
-            <p class="reveal-up delay-2">Membership tracking for gyms, salons, and tutors — built to replace the paper register, not your whole workflow.</p>
-            <div class="cta-row reveal-up delay-3">
-                <a href="https://play.google.com/store/apps/details?id=com.builtfirst.ezymember" class="btn-primary" target="_blank" rel="noopener">Download on Google Play</a>
-                <a href="https://builtfirstlabs.com/ezymember-landing/" class="btn-secondary" target="_blank" rel="noopener">Visit EzyMember →</a>
-            </div>
-            <span class="micro-note reveal-up delay-4">Offline by default. Private by design.</span>
+            <p class="reveal-up delay-2">An offline-first membership tracker for gyms, tutors, and salons. Add a member in two clicks, send a WhatsApp renewal reminder in one, back up privately to your own Google Drive, and hide financials when staff need the list but not the numbers.</p>
+            <a href="https://builtfirstlabs.com/ezymember-landing/" class="btn-primary reveal-up delay-3" target="_blank" rel="noopener">Explore EzyMember →</a>
         </div>
-
         <div class="showcase-container">
-            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/ezymember_banner_img.png" alt="EzyMember app preview" class="brand-header-img reveal-up">
-        </div>
-
-        <div class="feature-showcase">
-            <div class="feature-row reveal-up">
-                <div class="feature-copy">
-                    <span class="eyebrow">Renewals</span>
-                    <h3>Find Expiring Members Faster</h3>
-                    <p>Members sort themselves into Active, Expiring Soon, and Expired — then filter by 1, 2, 3 weeks, or a month to see exactly who needs a follow-up.</p>
-                </div>
-                <div class="feature-visual dual">
-                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_1.png" alt="Filtering members by expiry timeline in EzyMember">
-                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_2.png" alt="List of expiring members in EzyMember">
-                </div>
-            </div>
-
-            <div class="feature-row reveal-up">
-                <div class="feature-copy">
-                    <span class="eyebrow">Reminders</span>
-                    <h3>One-Click WhatsApp Reminders</h3>
-                    <p>Renewal reminders, expiry alerts, even welcome messages — every one pre-filled and ready. Preview, tweak if needed, and send in a single tap.</p>
-                </div>
-                <div class="feature-visual">
-                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_3.png" alt="WhatsApp reminder preview in EzyMember">
-                </div>
-            </div>
-
-            <div class="feature-row reveal-up">
-                <div class="feature-copy">
-                    <span class="eyebrow">Exports</span>
-                    <h3>Complete, Privacy-Safe Exports</h3>
-                    <p>Export a member's full history — every plan, date, and payment — to PDF or Excel. Toggle financials off for staff-safe reports whenever they need to be shared.</p>
-                </div>
-                <div class="feature-visual">
-                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_4.png" alt="Privacy-safe export options in EzyMember">
-                </div>
-            </div>
+            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/ezymember_banner_img.png" alt="EzyMember app preview" class="brand-header-img reveal-up delay-4">
         </div>
     </section>
 
-    <!-- Core Pillars Section -->
-    <section class="features" id="about">
-        <div class="section-intro">
-            <span class="eyebrow reveal-up">Our Philosophy</span>
-            <h2 class="reveal-up delay-1">Why we build differently.</h2>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card reveal-up">
-                <div class="feature-icon">⚡</div>
-                <h3>Solve Real Problems</h3>
-                <p>We don't build software for the sake of it. Every tool starts with something broken — a paper register, a manual reminder — and ends with something faster.</p>
-            </div>
-            <div class="feature-card reveal-up delay-1">
-                <div class="feature-icon">🛡️</div>
-                <h3>Private by Design</h3>
-                <p>No data harvesting, no fine print, no selling your information. Whatever we build, your business stays exactly that: yours.</p>
-            </div>
-            <div class="feature-card reveal-up delay-2">
-                <div class="feature-icon">📱</div>
-                <h3>Zero Learning Curve</h3>
-                <p>No onboarding screens, no manuals, no settings to dig through. Open the app, and you already know how to use it.</p>
-            </div>
-        </div>
+    <!-- Closing CTA -->
+    <section class="closing-cta">
+        <h2 class="reveal-up">See Product 01 for yourself.</h2>
+        <a href="https://play.google.com/store/apps/details?id=com.builtfirst.ezymember" class="btn-inverted reveal-up delay-1" target="_blank" rel="noopener">Download on Google Play</a>
+        <span class="micro-note reveal-up delay-2">Building in this space, or want to talk? We're at <a href="mailto:builtfirst.help@gmail.com">builtfirst.help@gmail.com</a>.</span>
     </section>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; <script>document.write(new Date().getFullYear())</script> BuiltFirstLabs. Built simple. Built to solve.</p>
+        <p>&copy; <script>document.write(new Date().getFullYear())</script> BuiltFirstLabs. We don't pick industries. We pick problems.</p>
         <p class="footer-sub"><a href="https://play.google.com/store/apps/dev?id=6526007241164374603" target="_blank" rel="noopener">See all our apps on Google Play →</a></p>
     </footer>
 
