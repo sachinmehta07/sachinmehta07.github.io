@@ -72,13 +72,12 @@
 
         /* Hero Section */
         .hero {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 140px 20px 60px;
+            padding: 180px 20px 100px;
         }
 
         .hero h1 {
@@ -116,22 +115,6 @@
         }
 
         /* Image Showcase (reused for the Product 01 visual) */
-        .showcase-container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px 0;
-            text-align: center;
-        }
-
-        .brand-header-img {
-            width: 100%;
-            max-width: 1000px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            will-change: transform, opacity;
-        }
-
         /* Why We Exist */
         .our-story {
             background: var(--white);
@@ -263,9 +246,120 @@
         }
 
         .product-spotlight .section-intro,
-        .product-spotlight .showcase-container {
+        .product-spotlight .product-carousel {
             position: relative;
             z-index: 1;
+        }
+
+        /* Product 01 carousel */
+        .product-carousel {
+            max-width: 1000px;
+            margin: 60px auto 0;
+        }
+
+        .carousel-viewport {
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            min-height: 420px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            padding: 0 10px;
+        }
+
+        .carousel-slide.cover-slide {
+            justify-content: center;
+        }
+
+        .carousel-slide.cover-slide img {
+            max-height: 420px;
+            width: auto;
+            max-width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+
+        .carousel-media {
+            flex: 0 0 45%;
+        }
+
+        .carousel-media img {
+            width: 100%;
+            max-height: 340px;
+            object-fit: contain;
+            display: block;
+            border-radius: 16px;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.08);
+        }
+
+        .carousel-copy {
+            flex: 1;
+            text-align: left;
+        }
+
+        .carousel-question {
+            display: block;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-black);
+            line-height: 1.35;
+            margin-bottom: 12px;
+        }
+
+        .carousel-answer {
+            color: var(--text-gray);
+            font-size: 15.5px;
+            line-height: 1.65;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(17,17,17,0.15);
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: background 0.3s ease, width 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background: var(--ezymember-teal);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 700px) {
+            .carousel-slide {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px 24px;
+                min-height: 460px;
+            }
+            .carousel-media {
+                flex: none;
+                width: 100%;
+            }
+            .carousel-slide.cover-slide img {
+                max-height: 300px;
+            }
         }
 
         .btn-primary {
@@ -444,8 +538,51 @@
             <p class="reveal-up delay-2">An offline-first membership tracker for gyms, tutors, and salons. Add a member in two clicks, send a WhatsApp renewal reminder in one, back up privately to your own Google Drive, and hide financials when staff need the list but not the numbers.</p>
             <a href="https://builtfirstlabs.com/ezymember-landing/" class="btn-primary reveal-up delay-3" target="_blank" rel="noopener">Explore EzyMember →</a>
         </div>
-        <div class="showcase-container">
-            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/ezymember_banner_img.png" alt="EzyMember app preview" class="brand-header-img reveal-up delay-4">
+        <div class="product-carousel reveal-up delay-4">
+            <div class="carousel-viewport">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide cover-slide">
+                        <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/ezymember_banner_img.png" alt="EzyMember app overview">
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="carousel-media">
+                            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_1.png" alt="Filtering members by expiry timeline in EzyMember">
+                        </div>
+                        <div class="carousel-copy">
+                            <span class="carousel-question">Tired of scrolling through messy records to see who's expiring?</span>
+                            <p class="carousel-answer">Filter by 1, 2, 3 weeks, or a month — see exactly who's coming up for renewal, instantly.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="carousel-media">
+                            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_2.png" alt="Members sorted by Active, Expiring, and Expired status in EzyMember">
+                        </div>
+                        <div class="carousel-copy">
+                            <span class="carousel-question">Want a clear view of who needs a follow-up today?</span>
+                            <p class="carousel-answer">Members sort themselves into Active, Expiring Soon, and Expired, so you always know exactly where you stand.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="carousel-media">
+                            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_3.png" alt="WhatsApp reminder preview in EzyMember">
+                        </div>
+                        <div class="carousel-copy">
+                            <span class="carousel-question">Still typing the same renewal message by hand, every time?</span>
+                            <p class="carousel-answer">Renewal reminders, expiry alerts, even welcome messages — every one pre-filled and ready. Preview, tweak if needed, and send in a single tap.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="carousel-media">
+                            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_4.png" alt="Privacy-safe export options in EzyMember">
+                        </div>
+                        <div class="carousel-copy">
+                            <span class="carousel-question">Need to share your member list without exposing your revenue?</span>
+                            <p class="carousel-answer">Export a member's full history — every plan, date, and payment — to PDF or Excel. Toggle financials off for staff-safe reports whenever they need to be shared.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-dots" id="carouselDots"></div>
         </div>
     </section>
 
@@ -481,6 +618,44 @@
 
             const revealElements = document.querySelectorAll('.reveal-up');
             revealElements.forEach(el => observer.observe(el));
+
+            // Product 01 carousel: auto-advancing, dot navigation, pauses on hover
+            const track = document.getElementById('carouselTrack');
+            const dotsContainer = document.getElementById('carouselDots');
+            if (track && dotsContainer) {
+                const slideCount = track.children.length;
+                let current = 0;
+                let timer;
+
+                for (let i = 0; i < slideCount; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+                    dot.addEventListener('click', () => goTo(i));
+                    dotsContainer.appendChild(dot);
+                }
+                const dots = dotsContainer.children;
+
+                const goTo = (index) => {
+                    current = index;
+                    track.style.transform = 'translateX(-' + (100 * index) + '%)';
+                    for (let i = 0; i < dots.length; i++) {
+                        dots[i].classList.toggle('active', i === index);
+                    }
+                    resetTimer();
+                };
+
+                const resetTimer = () => {
+                    clearInterval(timer);
+                    timer = setInterval(() => goTo((current + 1) % slideCount), 5000);
+                };
+
+                const viewport = track.closest('.carousel-viewport');
+                viewport.addEventListener('mouseenter', () => clearInterval(timer));
+                viewport.addEventListener('mouseleave', resetTimer);
+
+                resetTimer();
+            }
         });
     </script>
 </body>
