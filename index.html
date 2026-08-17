@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BuiltFirstLabs | We Don't Pick Industries.  We Pick Problems.</title>
+    <title>BuiltFirstLabs | We Don't Pick Industries. We Pick Problems.</title>
     <meta name="description" content="BuiltFirstLabs is a product company that finds ground-level problems software keeps overcomplicating, and fixes them with tools so simple they disappear. Product 01: EzyMember, an offline-first membership tracker for gyms, tutors, and salons.">
     <meta property="og:title" content="BuiltFirstLabs | We Don't Pick Industries. We Pick Problems.">
     <meta property="og:description" content="A product company that finds ground-level problems software overcomplicates, and fixes them with tools so simple they disappear.">
@@ -51,10 +51,21 @@
             align-items: center;
         }
 
-        .nav-logo img {
-            height: 52px;
-            width: auto;
-            display: block;
+        .nav-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-text {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            color: var(--primary-black);
+        }
+
+        .logo-accent {
+            color: var(--primary-blue);
         }
 
         .nav-links a {
@@ -90,6 +101,7 @@
 
         .hero h1 span {
             color: var(--primary-blue);
+            white-space: nowrap;
         }
 
         .hero p {
@@ -476,13 +488,12 @@
     <!-- Navigation -->
     <nav>
         <div class="nav-logo">
-            <!-- Using raw GitHub link so it loads from anywhere -->
-            <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/app_logo_no_bg.png" alt="BuiltFirstLabs Logo">
+            <span class="logo-text">BuiltFirst<span class="logo-accent">Labs</span></span>
         </div>
         <div class="nav-links">
             <a href="#story">Our Story</a>
             <a href="#how-we-build">How We Build</a>
-            <a href="#product">Product 01</a>
+            <a href="#product">Products</a>
         </div>
     </nav>
 
@@ -490,7 +501,7 @@
     <section class="hero">
         <h1 class="reveal-up">We don't pick industries. <span>We pick problems.</span></h1>
         <p class="reveal-up delay-1">One small problem at a time. Everywhere.</p>
-        <a href="#product" class="scroll-cta reveal-up delay-2">See Product 01 ↓</a>
+        <a href="#product" class="scroll-cta reveal-up delay-2">See Products ↓</a>
     </section>
 
     <!-- Why We Exist -->
