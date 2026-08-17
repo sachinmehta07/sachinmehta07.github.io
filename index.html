@@ -526,19 +526,44 @@
         }
         .hero-carousel-track {
             display: flex;
+            align-items: stretch;
             transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
         }
         .hero-carousel-slide {
-            min-width: 100%;
-            flex-shrink: 0;
+            width: 100%;
+            flex: 0 0 100%;
+            box-sizing: border-box;
             display: flex;
             justify-content: center;
-            align-items: center;
         }
-        .hero-carousel-slide img {
+        .slide-content {
             width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .slide-content img {
+            width: 100%;
+            display: block;
             border-radius: 20px;
             box-shadow: none;
+            object-fit: cover;
+        }
+        .slide-caption {
+            padding: 24px 16px 12px;
+            text-align: center;
+        }
+        .slide-caption strong {
+            display: block;
+            font-size: 18px;
+            color: var(--primary-black);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .slide-caption p {
+            font-size: 15px;
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin: 0;
         }
         .hero-carousel-btn {
             position: absolute;
@@ -887,11 +912,47 @@
                 <div class="product-hero-image reveal-up delay-2">
                     <div class="hero-carousel" id="heroCarousel">
                         <div class="hero-carousel-track" id="heroCarouselTrack">
-                            <div class="hero-carousel-slide"><img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/ezymember_banner_img.png" alt="EzyMember app showcase"></div>
-                            <div class="hero-carousel-slide"><img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_1.png" alt="Filtering members"></div>
-                            <div class="hero-carousel-slide"><img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_2.png" alt="Members sorted"></div>
-                            <div class="hero-carousel-slide"><img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_3.png" alt="WhatsApp reminder"></div>
-                            <div class="hero-carousel-slide"><img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_4.png" alt="Privacy-safe export"></div>
+                            <div class="hero-carousel-slide">
+                                <div class="slide-content">
+                                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/ezymember_banner_img.png" alt="EzyMember app showcase">
+                                </div>
+                            </div>
+                            <div class="hero-carousel-slide">
+                                <div class="slide-content">
+                                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_1.png" alt="Filtering members">
+                                    <div class="slide-caption">
+                                        <strong>Tired of scrolling messy records?</strong>
+                                        <p>Filter by timeline — see exactly who's coming up for renewal, instantly.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hero-carousel-slide">
+                                <div class="slide-content">
+                                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_2.png" alt="Members sorted">
+                                    <div class="slide-caption">
+                                        <strong>Clear view of follow-ups?</strong>
+                                        <p>Members sort themselves into Active, Expiring Soon, and Expired categories.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hero-carousel-slide">
+                                <div class="slide-content">
+                                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_3.png" alt="WhatsApp reminder">
+                                    <div class="slide-caption">
+                                        <strong>Still typing the same message?</strong>
+                                        <p>Pre-filled reminders ready to send in a single tap.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hero-carousel-slide">
+                                <div class="slide-content">
+                                    <img src="https://raw.githubusercontent.com/sachinmehta07/sachinmehta07.github.io/main/assets/feature_4.png" alt="Privacy-safe export">
+                                    <div class="slide-caption">
+                                        <strong>Share lists safely?</strong>
+                                        <p>Export history to PDF/Excel with a toggle to hide financials for staff-safe reports.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <button class="hero-carousel-btn prev" id="heroCarouselPrev" aria-label="Previous image">‹</button>
                         <button class="hero-carousel-btn next" id="heroCarouselNext" aria-label="Next image">›</button>
