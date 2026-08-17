@@ -156,16 +156,61 @@
             margin-bottom: 18px;
         }
 
-        .story-content p.positioning-line {
-            text-align: center;
-            color: var(--primary-black);
-            font-size: clamp(22px, 3vw, 28px);
-            font-weight: 800;
-            letter-spacing: -0.01em;
-            line-height: 1.4;
+        .unique-positioning {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
             margin-top: 48px;
             padding-top: 40px;
             border-top: 1px solid rgba(17,17,17,0.1);
+            text-align: left;
+        }
+
+        @media (min-width: 768px) {
+            .unique-positioning {
+                flex-direction: row;
+                gap: 24px;
+            }
+        }
+
+        .positioning-card {
+            flex: 1;
+            padding: 24px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .positioning-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        }
+
+        .positioning-card h4 {
+            font-size: 18px;
+            color: var(--primary-black);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .positioning-card p {
+            font-size: 15px !important;
+            margin-bottom: 0 !important;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+        
+        .card-icon.success {
+            color: #1F9787;
+        }
+
+        .card-icon.danger {
+            color: #e74c3c;
         }
 
         /* Shared centered section intro (How We Build + Product 01) */
@@ -491,6 +536,90 @@
         .delay-4 { transition-delay: 0.4s; }
         .delay-5 { transition-delay: 0.5s; }
         .delay-6 { transition-delay: 0.6s; }
+
+        .highlighted-quote {
+            background: linear-gradient(135deg, rgba(27, 93, 236, 0.05), rgba(31, 151, 135, 0.05));
+            border-left: 4px solid var(--primary-blue);
+            padding: 32px 40px;
+            border-radius: 0 16px 16px 0;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .highlighted-quote p {
+            color: var(--primary-black) !important;
+            font-size: 21px !important;
+            font-weight: 600 !important;
+            line-height: 1.6 !important;
+            margin-bottom: 0 !important;
+            letter-spacing: -0.01em;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 20px;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .nav-links {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .nav-links a {
+                margin-left: 12px;
+                margin-right: 12px;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+            .hero {
+                padding: 140px 20px 80px;
+            }
+            .our-story, .how-we-build, .product-spotlight, .closing-cta {
+                padding: 80px 20px;
+            }
+            .highlighted-quote {
+                padding: 24px;
+                margin: 32px 0;
+            }
+            .highlighted-quote p {
+                font-size: 18px !important;
+            }
+        }
+
+        .story-box {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--text-gray);
+            opacity: 0.2;
+        }
+
+        .story-box p:last-child {
+            margin-bottom: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .story-box {
+                padding: 24px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -519,11 +648,35 @@
         <div class="story-content">
             <span class="eyebrow reveal-up">Why We Exist</span>
             <h2 class="reveal-up delay-1">Built From Real Problems.</h2>
-            <p class="reveal-up delay-2">EzyMember started with a trainer, a paper register, and a gym owner with no good alternative.</p>
-            <p class="reveal-up delay-3">He wasn't alone. Everywhere we looked, it was the same choice — a register owners had outgrown, or software too expensive, too complicated, or too hard for staff to actually use.</p>
-            <p class="reveal-up delay-4">That gap became EzyMember. More importantly, it became our way of building.</p>
-            <p class="reveal-up delay-5">We don't start with an industry or a technology. We start with a person stuck between an outdated habit and a tool that doesn't fit. Then we build something that simply works.</p>
-            <p class="reveal-up delay-6 positioning-line">We build our own products. We don't build apps for hire.</p>
+            <div class="reveal-up delay-2 highlighted-quote">
+                <p>We don't start with an industry or a technology. We start with a person stuck between an outdated habit and a tool that doesn't fit. Then we build something that simply works.</p>
+            </div>
+            <div class="reveal-up delay-3 story-box">
+                <p>EzyMember started with a trainer, a paper register, and a gym owner with no good alternative.</p>
+                <p>He wasn't alone. Everywhere we looked, it was the same choice — a register owners had outgrown, or software too expensive, too complicated, or too hard for staff to actually use.</p>
+                <p>That gap became EzyMember. More importantly, it became our way of building.</p>
+            </div>
+            <div class="reveal-up delay-4 unique-positioning">
+                <div class="positioning-card">
+                    <h4>
+                        <svg class="card-icon success" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        We build our own products
+                    </h4>
+                    <p>We come up with our own ideas, develop the software, and own/manage the products ourselves.</p>
+                </div>
+                <div class="positioning-card">
+                    <h4>
+                        <svg class="card-icon danger" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        We don't build apps for hire
+                    </h4>
+                    <p>We don't take projects from clients like “Pay us ₹X and we'll build your app.”</p>
+                </div>
+            </div>
         </div>
     </section>
 
