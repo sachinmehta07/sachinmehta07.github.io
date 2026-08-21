@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="light" />
-<title>Dispatch Desk — Store ⇄ Kitchen Demo</title>
+<title>Indent Desk — Hub ⇄ Store Reconciliation</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -96,7 +96,7 @@
   .panel-heading-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
 
   .panel { background: var(--card); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 32px; }
-  .requests-section { margin-bottom: 36px; }
+  .section-block { margin-bottom: 36px; }
   .empty-note { color: var(--ink-soft); font-size: 13.5px; font-style: italic; }
 
   /* ---------- Store controls ---------- */
@@ -128,7 +128,7 @@
     transition: box-shadow .15s ease, transform .15s ease;
   }
   .sku-card:not(.is-disabled):hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-  .sku-card.is-disabled { opacity: .72; }
+  .sku-card.is-disabled { opacity: .55; }
   .sku-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
   .sku-cat { font-family: var(--font-display); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
   .sku-name { font-weight: 600; font-size: 15px; line-height: 1.3; }
@@ -167,7 +167,20 @@
   .cart-remove:hover { color: var(--bad); }
   .cart-foot { margin-top: 14px; }
 
-  .ticket-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .ticket-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+  /* ---------- Dispatch qty input ---------- */
+  .dispatch-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--card-line); }
+  .dispatch-row:last-child { border-bottom: none; }
+  .dispatch-name { font-size: 13.5px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dispatch-meta { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+  .dispatch-input {
+    width: 60px; padding: 5px 6px; border: 1.5px solid var(--card-line); border-radius: 6px;
+    font-family: var(--font-mono); font-weight: 600; font-size: 13px; text-align: center;
+    color: var(--ink); background: var(--card);
+  }
+  .dispatch-input:focus { border-color: var(--accent); outline: none; }
+  .dispatch-short { color: var(--bad); font-family: var(--font-mono); font-size: 11px; font-weight: 600; }
 
   /* ---------- Buttons ---------- */
   .btn {
@@ -178,6 +191,8 @@
   .btn-accent { background: var(--accent-solid); color: #fff; border-color: var(--accent-solid); }
   .btn-accent:hover { background: var(--accent-solid-hover); border-color: var(--accent-solid-hover); }
   .btn-accent:disabled { background: var(--card-line); border-color: var(--card-line); color: var(--ink-soft); cursor: not-allowed; }
+  .btn-good { background: var(--good); color: #fff; border-color: var(--good); }
+  .btn-good:hover { background: #256b40; border-color: #256b40; }
   .btn-ghost { background: transparent; color: var(--ink); border-color: var(--card-line); }
   .btn-ghost:hover { border-color: var(--ink); }
   .btn-sm { padding: 6px 12px; font-size: 12.5px; }
@@ -199,7 +214,7 @@
   .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; margin-bottom: 28px; }
   .stat-tile { background: var(--card); border-radius: var(--radius); border-top: 4px solid var(--ink); padding: 16px; box-shadow: var(--shadow); }
   .stat-tile.stat-pending { border-top-color: var(--pending); }
-  .stat-tile.stat-hold { border-top-color: var(--hold); }
+  .stat-tile.stat-transit { border-top-color: var(--transit); }
   .stat-tile.stat-bad { border-top-color: var(--bad); }
   .stat-tile.stat-neutral { border-top-color: var(--accent); }
   .stat-num { font-family: var(--font-mono); font-size: 28px; font-weight: 600; }
@@ -218,6 +233,13 @@
     font-weight: 600; font-size: 13px; padding: 6px 8px; border-radius: 6px;
     border: 1.5px solid var(--card-line); background: var(--card); width: 100%; cursor: pointer;
   }
+  .delete-btn {
+    background: none; border: 1.5px solid var(--card-line); border-radius: 6px;
+    color: var(--ink-soft); cursor: pointer; font-size: 13px; padding: 5px 10px;
+    font-family: var(--font-mono); transition: all .15s ease;
+  }
+  .delete-btn:hover { border-color: var(--bad); color: var(--bad); background: var(--bad-bg); }
+
   @media (max-width: 620px) {
     .sku-table-head { display: none; }
     .sku-table-row { grid-template-columns: 1fr 1fr; row-gap: 6px; padding: 12px 14px; }
@@ -229,7 +251,7 @@
   /* ---------- Modal ---------- */
   .modal-overlay { position: fixed; inset: 0; background: rgba(22,33,29,0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
   .modal-overlay.hidden { display: none; }
-  .modal-card { position: relative; background: var(--card); border-radius: 14px; padding: 26px 24px 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.28); }
+  .modal-card { position: relative; background: var(--card); border-radius: 14px; padding: 26px 24px 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.28); }
   .modal-tab {
     position: absolute; top: -14px; left: 24px; background: var(--accent-solid); color: #fff;
     font-family: var(--font-display); font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
@@ -261,15 +283,15 @@
 
   <header class="topbar">
     <div class="brand">
-      <div class="brand-mark">DD</div>
+      <div class="brand-mark">IR</div>
       <div class="brand-text">
-        <h1>Dispatch Desk</h1>
-        <p>Central kitchen ⇄ store indent tracker — demo</p>
+        <h1>Indent Desk</h1>
+        <p>Central hub ⇄ store indent & reconciliation — demo</p>
       </div>
     </div>
     <nav class="view-toggle" role="tablist">
       <button type="button" data-view="store" class="active" role="tab" aria-selected="true">Store View</button>
-      <button type="button" data-view="hub" role="tab" aria-selected="false">Kitchen View</button>
+      <button type="button" data-view="hub" role="tab" aria-selected="false">Hub View</button>
     </nav>
   </header>
 
@@ -289,56 +311,60 @@
       <div class="store-layout">
         <div class="catalog-panel">
           <div class="panel-heading">
-            <h2>Today's Catalog</h2>
-            <p>Sample of the 100‑SKU range — tap + to add an item to your request.</p>
+            <h2>Available Catalog</h2>
+            <p>Browse FMCG items — tap + to add to your indent request.</p>
           </div>
           <div class="sku-grid" id="skuGrid"></div>
         </div>
 
         <aside class="cart-panel ticket">
           <div class="ticket-head">
-            <span class="ticket-store">New Request</span>
+            <span class="ticket-store">New Indent</span>
             <span class="cart-count" id="cartCount"></span>
           </div>
           <div class="ticket-tear"></div>
           <div class="ticket-body" id="cartList"></div>
           <div class="cart-foot">
-            <button type="button" class="btn btn-accent btn-block" id="submitRequestBtn" disabled>Submit Request</button>
+            <button type="button" class="btn btn-accent btn-block" id="submitRequestBtn" disabled>Submit Indent Request</button>
           </div>
         </aside>
       </div>
 
-      <div class="requests-section">
+      <!-- My Orders -->
+      <div class="section-block">
         <div class="panel-heading">
-          <h2>My Requests</h2>
-          <p>Status updates from the central kitchen land here.</p>
+          <h2>My Indent Requests</h2>
+          <p>Track status updates from the central hub here.</p>
         </div>
         <div class="ticket-rail" id="myRequestsList"></div>
       </div>
     </section>
 
-    <!-- ===================== VIEW B — CENTRAL KITCHEN ===================== -->
+    <!-- ===================== VIEW B — CENTRAL HUB ===================== -->
     <section id="view-hub" class="view" aria-hidden="true">
 
       <div class="stats-bar" id="statsBar"></div>
 
+      <!-- Combined Demand -->
       <div class="panel">
         <div class="panel-heading">
-          <h2>Today's Combined Demand</h2>
-          <p>Every pending and on‑hold request, totalled by item — pack once, not five times.</p>
+          <h2>Combined Demand</h2>
+          <p>All pending indent quantities, totalled by item — pack once, dispatch to many.</p>
         </div>
         <div id="demandList"></div>
       </div>
 
-      <div class="requests-section">
+      <!-- Needs Action -->
+      <div class="section-block">
         <div class="panel-heading">
           <h2>Needs Action</h2>
-          <p>New indents from the stores, oldest first.</p>
+          <p>Incoming indents from stores. Edit dispatch quantities if stock is short, then dispatch.</p>
         </div>
         <div class="ticket-rail" id="hubNeedsAction"></div>
       </div>
 
-      <div class="requests-section">
+      <!-- Completed -->
+      <div class="section-block">
         <div class="panel-heading">
           <h2>Completed Today</h2>
           <p>Dispatched and received indents.</p>
@@ -346,16 +372,17 @@
         <div class="ticket-rail" id="hubCompleted"></div>
       </div>
 
+      <!-- SKU Catalog -->
       <div class="panel">
         <div class="panel-heading panel-heading-row">
           <div>
             <h2>SKU Catalog</h2>
-            <p>Flip an item's status and every store sees it instantly.</p>
+            <p>Change an item's availability — every store sees it instantly.</p>
           </div>
           <button type="button" class="btn btn-accent" id="addSkuBtn">+ Add SKU</button>
         </div>
         <div class="sku-table-head">
-          <span>Item</span><span>Category</span><span>Unit</span><span>Status</span>
+          <span>Item</span><span>Category</span><span>Unit</span><span>Status / Actions</span>
         </div>
         <div id="hubSkuTable"></div>
         <span class="flash-note" id="hubFlash"></span>
@@ -364,7 +391,7 @@
 
   </main>
 
-  <p class="page-footer">Demo prototype — Store View and Kitchen View share this tab's memory only, so data resets on reload. No real orders are sent.</p>
+  <p class="page-footer">Indent Desk — demo prototype. Data persists in your browser's localStorage.</p>
 
   <!-- ===================== ADD SKU MODAL ===================== -->
   <div class="modal-overlay hidden" id="addSkuModal">
@@ -372,20 +399,20 @@
       <span class="modal-tab">New Item</span>
       <h3 id="addSkuTitle">Add SKU to catalog</h3>
       <label class="field-block">Item name
-        <input type="text" id="newSkuName" placeholder="e.g. Schezwan Fried Rice" maxlength="60">
+        <input type="text" id="newSkuName" placeholder="e.g. Masala Peanuts 200g" maxlength="60">
       </label>
       <div class="modal-row">
         <label class="field-block">Category
-          <input type="text" id="newSkuCategory" placeholder="e.g. Rice" maxlength="30">
+          <input type="text" id="newSkuCategory" placeholder="e.g. Namkeens" maxlength="30">
         </label>
         <label class="field-block">Unit
-          <input type="text" id="newSkuUnit" placeholder="e.g. box" maxlength="20">
+          <input type="text" id="newSkuUnit" placeholder="e.g. pack" maxlength="20">
         </label>
       </div>
       <label class="field-block">Starting status
         <select id="newSkuStatus">
           <option value="in_stock">In Stock</option>
-          <option value="in_process">In Process</option>
+          <option value="low_stock">Low Stock</option>
           <option value="out_of_stock">Out of Stock</option>
         </select>
       </label>
@@ -398,69 +425,87 @@
 
 <script>
   // ---------------------------------------------------------------
-  // Data
+  // Constants
   // ---------------------------------------------------------------
+  const LS_SKUS     = 'indent_desk_skus';
+  const LS_REQUESTS = 'indent_desk_requests';
+  const LS_SEQ      = 'indent_desk_seq';
+
   const STORES = [
-    { id: 's1', name: 'Store 1' },
-    { id: 's2', name: 'Store 2' },
-    { id: 's3', name: 'Store 3' },
-    { id: 's4', name: 'Store 4' },
-    { id: 's5', name: 'Store 5' },
+    { id: 's1', name: 'Store 1 — MG Road' },
+    { id: 's2', name: 'Store 2 — Koramangala' },
+    { id: 's3', name: 'Store 3 — Indiranagar' },
+    { id: 's4', name: 'Store 4 — Whitefield' },
+    { id: 's5', name: 'Store 5 — Jayanagar' },
   ];
-
-  let skus = [
-    { id: 'dal-makhani',      name: 'Dal Makhani',            category: 'Curries',   unit: 'pack',   status: 'in_stock' },
-    { id: 'paneer-tikka',     name: 'Paneer Tikka Masala',    category: 'Curries',   unit: 'pack',   status: 'in_stock' },
-    { id: 'butter-chicken',   name: 'Butter Chicken',         category: 'Curries',   unit: 'pack',   status: 'in_process' },
-    { id: 'mixed-veg',        name: 'Mixed Veg Curry',        category: 'Curries',   unit: 'pack',   status: 'in_stock' },
-    { id: 'chole-bhature',    name: 'Chole Bhature',          category: 'Curries',   unit: 'pack',   status: 'in_process' },
-    { id: 'veg-biryani',      name: 'Veg Biryani',            category: 'Rice',      unit: 'box',    status: 'in_stock' },
-    { id: 'chicken-biryani',  name: 'Chicken Biryani',        category: 'Rice',      unit: 'box',    status: 'out_of_stock' },
-    { id: 'jeera-rice',       name: 'Jeera Rice',             category: 'Rice',      unit: 'box',    status: 'in_stock' },
-    { id: 'rajma-chawal',     name: 'Rajma Chawal',           category: 'Rice',      unit: 'box',    status: 'in_stock' },
-    { id: 'tandoori-roti',    name: 'Tandoori Roti (6 pc)',   category: 'Breads',    unit: 'pack',   status: 'in_stock' },
-    { id: 'butter-naan',      name: 'Butter Naan (4 pc)',     category: 'Breads',    unit: 'pack',   status: 'in_stock' },
-    { id: 'curd-cup',         name: 'Curd Cup (200g)',        category: 'Sides',     unit: 'cup',    status: 'in_stock' },
-    { id: 'green-salad',      name: 'Green Salad Pack',       category: 'Sides',     unit: 'pack',   status: 'in_stock' },
-    { id: 'papad',            name: 'Papad (4 pc)',           category: 'Sides',     unit: 'pack',   status: 'out_of_stock' },
-    { id: 'gulab-jamun',      name: 'Gulab Jamun (2 pc)',     category: 'Desserts',  unit: 'pack',   status: 'in_stock' },
-    { id: 'rasmalai',         name: 'Rasmalai (2 pc)',        category: 'Desserts',  unit: 'pack',   status: 'in_process' },
-    { id: 'masala-chaas',     name: 'Masala Chaas (200ml)',   category: 'Beverages', unit: 'bottle', status: 'in_stock' },
-    { id: 'packaged-water',   name: 'Packaged Water (500ml)', category: 'Beverages', unit: 'bottle', status: 'in_stock' },
-  ];
-
-  let reqSeq = 0;
-  function mkReq(storeId, itemsObj, status, time) {
-    reqSeq += 1;
-    const items = Object.entries(itemsObj).map(([skuId, qty]) => ({ skuId, qty }));
-    return { id: 'req' + reqSeq, seq: reqSeq, storeId, items, status, time };
-  }
-
-  let requests = [
-    mkReq('s1', { 'dal-makhani': 20, 'paneer-tikka': 10 }, 'pending', '9:15 AM'),
-    mkReq('s2', { 'paneer-tikka': 15 }, 'pending', '9:40 AM'),
-    mkReq('s3', { 'jeera-rice': 12, 'tandoori-roti': 25 }, 'on_hold', '10:05 AM'),
-    mkReq('s4', { 'gulab-jamun': 30, 'masala-chaas': 20 }, 'dispatched', '8:50 AM'),
-    mkReq('s5', { 'rajma-chawal': 10, 'curd-cup': 15 }, 'received', '8:20 AM'),
-  ];
-
-  let carts = {};
-  STORES.forEach(s => { carts[s.id] = {}; });
-
-  let currentStoreId = STORES[0].id;
-  let newSkuCounter = 0;
 
   const SKU_STATUS = {
-    in_stock:     { label: 'In Stock',     cls: 'good' },
-    in_process:   { label: 'In Process',   cls: 'hold' },
-    out_of_stock: { label: 'Out of Stock', cls: 'bad' },
+    in_stock:      { label: 'In Stock',      cls: 'good' },
+    low_stock:     { label: 'Low Stock',     cls: 'hold' },
+    out_of_stock:  { label: 'Out of Stock',  cls: 'bad' },
   };
+
   const REQ_STATUS = {
     pending:    { label: 'Pending',    cls: 'pending' },
     on_hold:    { label: 'On Hold',    cls: 'hold' },
     dispatched: { label: 'Dispatched', cls: 'transit' },
     received:   { label: 'Received',   cls: 'good' },
+    short:      { label: 'Short Fill', cls: 'bad' },
   };
+
+  const SEED_SKUS = [
+    { id: 'masala-peanuts',   name: 'Masala Peanuts 200g',     category: 'Namkeens',    unit: 'pack',   status: 'in_stock' },
+    { id: 'bhujia-sev',      name: 'Bhujia Sev 500g',         category: 'Namkeens',    unit: 'pack',   status: 'in_stock' },
+    { id: 'aloo-bhujia',     name: 'Aloo Bhujia 400g',        category: 'Namkeens',    unit: 'pack',   status: 'low_stock' },
+    { id: 'mixture',         name: 'Navratna Mixture 300g',    category: 'Namkeens',    unit: 'pack',   status: 'in_stock' },
+    { id: 'choco-chip',      name: 'Choco-Chip Cookies',      category: 'Cookies',     unit: 'pack',   status: 'in_stock' },
+    { id: 'cream-biscuit',   name: 'Cream Biscuit Orange',    category: 'Cookies',     unit: 'pack',   status: 'in_stock' },
+    { id: 'butter-cookies',  name: 'Butter Cookies Tin',      category: 'Cookies',     unit: 'tin',    status: 'out_of_stock' },
+    { id: 'dairy-milk',      name: 'Dairy Milk Silk 150g',    category: 'Chocolates',  unit: 'bar',    status: 'in_stock' },
+    { id: 'kitkat',          name: 'KitKat 4-Finger',         category: 'Chocolates',  unit: 'pack',   status: 'in_stock' },
+    { id: 'five-star',       name: '5 Star 40g (box of 24)',  category: 'Chocolates',  unit: 'box',    status: 'in_stock' },
+    { id: 'mango-juice',     name: 'Mango Juice 1L',          category: 'Beverages',   unit: 'bottle', status: 'in_stock' },
+    { id: 'cola-can',        name: 'Cola Can 300ml',          category: 'Beverages',   unit: 'can',    status: 'in_stock' },
+    { id: 'mineral-water',   name: 'Mineral Water 500ml',     category: 'Beverages',   unit: 'bottle', status: 'in_stock' },
+    { id: 'instant-noodles', name: 'Instant Noodles (4-pk)',  category: 'Snacks',      unit: 'pack',   status: 'low_stock' },
+    { id: 'potato-chips',    name: 'Potato Chips Classic',    category: 'Snacks',      unit: 'pack',   status: 'in_stock' },
+  ];
+
+  // ---------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------
+  let skus, requests, reqSeq, carts, currentStoreId;
+
+  function loadState() {
+    const savedSkus = localStorage.getItem(LS_SKUS);
+    skus = savedSkus ? JSON.parse(savedSkus) : JSON.parse(JSON.stringify(SEED_SKUS));
+
+    const savedReqs = localStorage.getItem(LS_REQUESTS);
+    if (savedReqs) {
+      requests = JSON.parse(savedReqs);
+    } else {
+      reqSeq = 0;
+      requests = [
+        mkReq('s1', { 'masala-peanuts': 20, 'dairy-milk': 15, 'mango-juice': 10 }, 'pending',    '9:15 AM'),
+        mkReq('s2', { 'choco-chip': 25, 'bhujia-sev': 12 },                        'pending',    '9:40 AM'),
+        mkReq('s3', { 'kitkat': 30, 'cola-can': 20 },                              'on_hold',    '10:05 AM'),
+        mkReq('s4', { 'potato-chips': 40, 'cream-biscuit': 18 },                   'dispatched', '8:50 AM'),
+        mkReq('s5', { 'mixture': 15, 'mineral-water': 24 },                        'received',   '8:20 AM'),
+      ];
+    }
+
+    reqSeq = parseInt(localStorage.getItem(LS_SEQ) || '0', 10) || requests.length;
+
+    carts = {};
+    STORES.forEach(s => { carts[s.id] = {}; });
+    currentStoreId = STORES[0].id;
+  }
+
+  function persist() {
+    localStorage.setItem(LS_SKUS, JSON.stringify(skus));
+    localStorage.setItem(LS_REQUESTS, JSON.stringify(requests));
+    localStorage.setItem(LS_SEQ, String(reqSeq));
+  }
 
   // ---------------------------------------------------------------
   // Helpers
@@ -469,8 +514,9 @@
     return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   }
   function findSku(id) { return skus.find(s => s.id === id); }
-  function badge(map, key) {
+  function badgeHtml(map, key) {
     const m = map[key];
+    if (!m) return '';
     return `<span class="badge badge-${m.cls}">${m.label}</span>`;
   }
   function flashNote(elId, msg) {
@@ -478,7 +524,14 @@
     el.textContent = msg;
     el.classList.add('show');
     clearTimeout(el._t);
-    el._t = setTimeout(() => el.classList.remove('show'), 2600);
+    el._t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+  function mkReq(storeId, itemsObj, status, time) {
+    reqSeq += 1;
+    const items = Object.entries(itemsObj).map(([skuId, qty]) => ({
+      skuId, qty, dispatchedQty: status === 'dispatched' || status === 'received' ? qty : null
+    }));
+    return { id: 'req' + reqSeq, seq: reqSeq, storeId, items, status, time };
   }
 
   // ---------------------------------------------------------------
@@ -491,7 +544,7 @@
       b.setAttribute('aria-selected', active ? 'true' : 'false');
     });
     const storeSec = document.getElementById('view-store');
-    const hubSec = document.getElementById('view-hub');
+    const hubSec   = document.getElementById('view-hub');
     storeSec.classList.toggle('active', view === 'store');
     storeSec.setAttribute('aria-hidden', view === 'store' ? 'false' : 'true');
     hubSec.classList.toggle('active', view === 'hub');
@@ -500,7 +553,7 @@
   }
 
   // ---------------------------------------------------------------
-  // Render
+  // Render All
   // ---------------------------------------------------------------
   function renderAll() {
     renderStoreSelect();
@@ -513,39 +566,47 @@
     renderHubSkuTable();
   }
 
+  // ---------------------------------------------------------------
+  // STORE: select
+  // ---------------------------------------------------------------
   function renderStoreSelect() {
     const sel = document.getElementById('storeSelect');
-    sel.innerHTML = STORES.map(s => `<option value="${s.id}" ${s.id === currentStoreId ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
+    sel.innerHTML = STORES.map(s =>
+      `<option value="${s.id}" ${s.id === currentStoreId ? 'selected' : ''}>${esc(s.name)}</option>`
+    ).join('');
   }
 
+  // ---------------------------------------------------------------
+  // STORE: catalog grid
+  // ---------------------------------------------------------------
   function renderSkuGrid() {
     const grid = document.getElementById('skuGrid');
     const cart = carts[currentStoreId];
     grid.innerHTML = skus.map(s => {
       const qty = cart[s.id] || 0;
-      const orderable = s.status === 'in_stock';
+      const orderable = s.status === 'in_stock' || s.status === 'low_stock';
       return `
       <div class="sku-card ${orderable ? '' : 'is-disabled'}">
         <div class="sku-top">
           <span class="sku-cat">${esc(s.category)}</span>
-          ${badge(SKU_STATUS, s.status)}
+          ${badgeHtml(SKU_STATUS, s.status)}
         </div>
         <div class="sku-name">${esc(s.name)}</div>
         <div class="sku-unit">per ${esc(s.unit)}</div>
         ${orderable ? `
           <div class="qty-stepper">
-            <button type="button" class="qty-btn" onclick="changeQty('${s.id}', -1)" aria-label="Decrease quantity">−</button>
+            <button type="button" class="qty-btn" onclick="changeQty('${s.id}', -1)" aria-label="Decrease">−</button>
             <span class="qty-value">${qty}</span>
-            <button type="button" class="qty-btn" onclick="changeQty('${s.id}', 1)" aria-label="Increase quantity">+</button>
+            <button type="button" class="qty-btn" onclick="changeQty('${s.id}', 1)" aria-label="Increase">+</button>
           </div>` : `
-          <div class="sku-note">${s.status === 'in_process' ? 'Ordering paused while prepping' : 'Currently unavailable'}</div>`}
+          <div class="sku-note">Currently unavailable</div>`}
       </div>`;
     }).join('');
   }
 
   function changeQty(skuId, delta) {
     const s = findSku(skuId);
-    if (!s || s.status !== 'in_stock') return;
+    if (!s || s.status === 'out_of_stock') return;
     const cart = carts[currentStoreId];
     const next = Math.max(0, (cart[skuId] || 0) + delta);
     if (next === 0) delete cart[skuId]; else cart[skuId] = next;
@@ -553,21 +614,24 @@
     renderCart();
   }
 
+  // ---------------------------------------------------------------
+  // STORE: cart
+  // ---------------------------------------------------------------
   function renderCart() {
     const cart = carts[currentStoreId];
     const entries = Object.entries(cart).filter(([, q]) => q > 0);
     const list = document.getElementById('cartList');
     document.getElementById('cartCount').textContent = entries.length ? `(${entries.length})` : '';
     if (!entries.length) {
-      list.innerHTML = `<p class="empty-note">Tap + on any in‑stock item to start today's request.</p>`;
+      list.innerHTML = `<p class="empty-note">Tap + on any in‑stock item to build today's indent.</p>`;
     } else {
       list.innerHTML = entries.map(([skuId, qty]) => {
         const s = findSku(skuId);
         return `<div class="cart-row">
-          <span class="cart-name">${esc(s.name)}</span>
+          <span class="cart-name">${esc(s ? s.name : skuId)}</span>
           <span class="cart-leader"></span>
-          <span class="cart-qty">${qty} <small>${esc(s.unit)}</small></span>
-          <button type="button" class="cart-remove" onclick="removeFromCart('${s.id}')" aria-label="Remove ${esc(s.name)} from request">✕</button>
+          <span class="cart-qty">${qty} <small>${esc(s ? s.unit : '')}</small></span>
+          <button type="button" class="cart-remove" onclick="removeFromCart('${skuId}')" aria-label="Remove">✕</button>
         </div>`;
       }).join('');
     }
@@ -589,39 +653,55 @@
     const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     requests.push(mkReq(currentStoreId, itemsObj, 'pending', time));
     carts[currentStoreId] = {};
+    persist();
     renderAll();
-    flashNote('storeFlash', 'Request sent to the central kitchen.');
+    flashNote('storeFlash', 'Indent sent to the central hub!');
   }
 
+  // ---------------------------------------------------------------
+  // STORE: my requests
+  // ---------------------------------------------------------------
   function renderMyRequests() {
     const list = document.getElementById('myRequestsList');
     const mine = requests.filter(r => r.storeId === currentStoreId).slice().sort((a, b) => b.seq - a.seq);
     list.innerHTML = mine.length
       ? mine.map(r => ticketCard(r, { showReceive: true })).join('')
-      : `<p class="empty-note">No requests placed yet today.</p>`;
+      : `<p class="empty-note">No indent requests placed yet.</p>`;
   }
 
+  // ---------------------------------------------------------------
+  // Ticket Card (shared)
+  // ---------------------------------------------------------------
   function ticketCard(r, opts) {
     opts = opts || {};
     const store = STORES.find(s => s.id === r.storeId);
+
     const itemsHtml = r.items.map(it => {
       const s = findSku(it.skuId);
+      const name = s ? s.name : it.skuId;
+      const unit = s ? s.unit : '';
+
+      // Show dispatched vs ordered comparison for dispatched/received
+      if ((r.status === 'dispatched' || r.status === 'received' || r.status === 'short') && it.dispatchedQty !== null) {
+        const isShort = it.dispatchedQty < it.qty;
+        return `<div class="ticket-row">
+          <span class="ticket-item-name">${esc(name)}</span>
+          <span class="ticket-leader"></span>
+          <span class="ticket-item-qty">${it.dispatchedQty}/${it.qty} <small>${esc(unit)}</small></span>
+          ${isShort ? '<span class="dispatch-short">SHORT</span>' : ''}
+        </div>`;
+      }
+
       return `<div class="ticket-row">
-        <span class="ticket-item-name">${esc(s ? s.name : 'Unknown item')}</span>
+        <span class="ticket-item-name">${esc(name)}</span>
         <span class="ticket-leader"></span>
-        <span class="ticket-item-qty">${it.qty} <small>${esc(s ? s.unit : '')}</small></span>
+        <span class="ticket-item-qty">${it.qty} <small>${esc(unit)}</small></span>
       </div>`;
     }).join('');
 
     let actions = '';
-    if (opts.hubActions && r.status === 'pending') {
-      actions = `<button type="button" class="btn btn-accent btn-sm" onclick="hubDispatch('${r.id}')">Dispatch</button>
-                 <button type="button" class="btn btn-ghost btn-sm" onclick="hubHold('${r.id}')">Hold</button>`;
-    } else if (opts.hubActions && r.status === 'on_hold') {
-      actions = `<button type="button" class="btn btn-accent btn-sm" onclick="hubDispatch('${r.id}')">Dispatch</button>
-                 <button type="button" class="btn btn-ghost btn-sm" onclick="hubResume('${r.id}')">Resume</button>`;
-    } else if (opts.showReceive && r.status === 'dispatched') {
-      actions = `<button type="button" class="btn btn-accent btn-sm" onclick="markReceived('${r.id}')">Mark Received</button>`;
+    if (opts.showReceive && r.status === 'dispatched') {
+      actions = `<button type="button" class="btn btn-good btn-sm" onclick="markReceived('${r.id}')">Mark Received</button>`;
     }
 
     return `
@@ -629,7 +709,7 @@
       <div class="ticket-head">
         <span class="ticket-seq">№ ${String(r.seq).padStart(3, '0')}</span>
         <span class="ticket-store">${esc(store ? store.name : '')}</span>
-        ${badge(REQ_STATUS, r.status)}
+        ${badgeHtml(REQ_STATUS, r.status)}
       </div>
       <div class="ticket-tear"></div>
       <div class="ticket-body">${itemsHtml}</div>
@@ -640,34 +720,34 @@
     </div>`;
   }
 
-  function hubDispatch(id) {
-    const r = requests.find(x => x.id === id);
-    if (r) { r.status = 'dispatched'; renderAll(); flashNote('hubFlash', 'Marked as dispatched.'); }
-  }
-  function hubHold(id) {
-    const r = requests.find(x => x.id === id);
-    if (r) { r.status = 'on_hold'; renderAll(); }
-  }
-  function hubResume(id) {
-    const r = requests.find(x => x.id === id);
-    if (r) { r.status = 'pending'; renderAll(); }
-  }
   function markReceived(id) {
     const r = requests.find(x => x.id === id);
-    if (r) { r.status = 'received'; renderAll(); flashNote('storeFlash', 'Marked as received. Thanks!'); }
+    if (r) {
+      r.status = 'received';
+      persist();
+      renderAll();
+      flashNote('storeFlash', 'Shipment received & confirmed!');
+    }
   }
 
+  // ---------------------------------------------------------------
+  // HUB: stats bar
+  // ---------------------------------------------------------------
   function renderStatsBar() {
-    const pending = requests.filter(r => r.status === 'pending').length;
-    const hold = requests.filter(r => r.status === 'on_hold').length;
-    const oos = skus.filter(s => s.status === 'out_of_stock').length;
+    const pending    = requests.filter(r => r.status === 'pending').length;
+    const onHold     = requests.filter(r => r.status === 'on_hold').length;
+    const inTransit  = requests.filter(r => r.status === 'dispatched').length;
+    const oos        = skus.filter(s => s.status === 'out_of_stock').length;
     document.getElementById('statsBar').innerHTML = `
       <div class="stat-tile stat-pending"><div class="stat-num">${pending}</div><div class="stat-label">Pending</div></div>
-      <div class="stat-tile stat-hold"><div class="stat-num">${hold}</div><div class="stat-label">On Hold</div></div>
+      <div class="stat-tile stat-transit"><div class="stat-num">${inTransit}</div><div class="stat-label">In Transit</div></div>
       <div class="stat-tile stat-bad"><div class="stat-num">${oos}</div><div class="stat-label">Out of Stock</div></div>
       <div class="stat-tile stat-neutral"><div class="stat-num">${STORES.length}</div><div class="stat-label">Active Stores</div></div>`;
   }
 
+  // ---------------------------------------------------------------
+  // HUB: combined demand
+  // ---------------------------------------------------------------
   function renderDemand() {
     const totals = {};
     requests.filter(r => r.status === 'pending' || r.status === 'on_hold').forEach(r => {
@@ -679,37 +759,108 @@
       ? rows.map(([skuId, qty]) => {
           const s = findSku(skuId);
           return `<div class="manifest-row">
-            <span class="manifest-name">${esc(s ? s.name : 'Unknown item')}</span>
+            <span class="manifest-name">${esc(s ? s.name : skuId)}</span>
             <span class="manifest-leader"></span>
             <span class="manifest-qty">${qty} <small>${esc(s ? s.unit : '')}</small></span>
           </div>`;
         }).join('')
-      : `<p class="empty-note">No open requests right now — the manifest is clear.</p>`;
+      : `<p class="empty-note">No open indents — the manifest is clear.</p>`;
   }
 
+  // ---------------------------------------------------------------
+  // HUB: request cards (with dispatch controls)
+  // ---------------------------------------------------------------
   function renderHubRequests() {
     const needs = requests.filter(r => r.status === 'pending' || r.status === 'on_hold').slice().sort((a, b) => a.seq - b.seq);
-    const done = requests.filter(r => r.status === 'dispatched' || r.status === 'received').slice().sort((a, b) => b.seq - a.seq);
+    const done  = requests.filter(r => r.status === 'dispatched' || r.status === 'received' || r.status === 'short').slice().sort((a, b) => b.seq - a.seq);
+
     document.getElementById('hubNeedsAction').innerHTML = needs.length
-      ? needs.map(r => ticketCard(r, { hubActions: true })).join('')
+      ? needs.map(r => hubActionCard(r)).join('')
       : `<p class="empty-note">All caught up — nothing waiting on dispatch.</p>`;
+
     document.getElementById('hubCompleted').innerHTML = done.length
       ? done.map(r => ticketCard(r, {})).join('')
       : `<p class="empty-note">Nothing dispatched yet today.</p>`;
   }
 
+  function hubActionCard(r) {
+    const store = STORES.find(s => s.id === r.storeId);
+    const itemRows = r.items.map(it => {
+      const s = findSku(it.skuId);
+      return `<div class="dispatch-row">
+        <span class="dispatch-name">${esc(s ? s.name : it.skuId)}</span>
+        <span class="dispatch-meta">Ord: ${it.qty}</span>
+        <input type="number" class="dispatch-input" min="0" max="${it.qty}" value="${it.qty}"
+               data-req="${r.id}" data-sku="${it.skuId}" aria-label="Dispatch qty for ${esc(s ? s.name : it.skuId)}" />
+      </div>`;
+    }).join('');
+
+    const isPending = r.status === 'pending';
+    const holdBtn = isPending
+      ? `<button type="button" class="btn btn-ghost btn-sm" onclick="hubHold('${r.id}')">Hold</button>`
+      : `<button type="button" class="btn btn-ghost btn-sm" onclick="hubResume('${r.id}')">Resume</button>`;
+
+    return `
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="ticket-seq">№ ${String(r.seq).padStart(3, '0')}</span>
+        <span class="ticket-store">${esc(store ? store.name : '')}</span>
+        ${badgeHtml(REQ_STATUS, r.status)}
+      </div>
+      <div class="ticket-tear"></div>
+      <div class="ticket-body">${itemRows}</div>
+      <div class="ticket-foot">
+        <span class="ticket-time">${esc(r.time)}</span>
+        <div class="ticket-actions">
+          <button type="button" class="btn btn-accent btn-sm" onclick="hubDispatch('${r.id}')">Dispatch</button>
+          ${holdBtn}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function hubDispatch(id) {
+    const r = requests.find(x => x.id === id);
+    if (!r) return;
+    let anyShort = false;
+    r.items.forEach(it => {
+      const input = document.querySelector(`[data-req="${id}"][data-sku="${it.skuId}"]`);
+      const val = input ? Math.max(0, parseInt(input.value, 10) || 0) : it.qty;
+      it.dispatchedQty = Math.min(val, it.qty);
+      if (it.dispatchedQty < it.qty) anyShort = true;
+    });
+    r.status = anyShort ? 'dispatched' : 'dispatched';
+    persist();
+    renderAll();
+    flashNote('hubFlash', anyShort ? 'Dispatched with short fill.' : 'Dispatched in full!');
+  }
+
+  function hubHold(id) {
+    const r = requests.find(x => x.id === id);
+    if (r) { r.status = 'on_hold'; persist(); renderAll(); }
+  }
+
+  function hubResume(id) {
+    const r = requests.find(x => x.id === id);
+    if (r) { r.status = 'pending'; persist(); renderAll(); }
+  }
+
+  // ---------------------------------------------------------------
+  // HUB: SKU table
+  // ---------------------------------------------------------------
   function renderHubSkuTable() {
     document.getElementById('hubSkuTable').innerHTML = skus.map(s => `
       <div class="sku-table-row">
         <div class="field field-name">${esc(s.name)}</div>
-        <div class="field field-meta"><span class="field-label">Category</span>${esc(s.category)}</div>
-        <div class="field field-meta"><span class="field-label">Unit</span>${esc(s.unit)}</div>
-        <div class="field field-status">
-          <select class="status-select" onchange="setSkuStatus('${s.id}', this.value)">
+        <div class="field field-meta"><span class="field-label">Cat </span>${esc(s.category)}</div>
+        <div class="field field-meta"><span class="field-label">Unit </span>${esc(s.unit)}</div>
+        <div class="field field-status" style="display:flex;gap:6px;align-items:center;">
+          <select class="status-select" onchange="setSkuStatus('${s.id}', this.value)" style="flex:1;">
             <option value="in_stock" ${s.status === 'in_stock' ? 'selected' : ''}>In Stock</option>
-            <option value="in_process" ${s.status === 'in_process' ? 'selected' : ''}>In Process</option>
+            <option value="low_stock" ${s.status === 'low_stock' ? 'selected' : ''}>Low Stock</option>
             <option value="out_of_stock" ${s.status === 'out_of_stock' ? 'selected' : ''}>Out of Stock</option>
           </select>
+          <button type="button" class="delete-btn" onclick="deleteSku('${s.id}')" title="Remove SKU" aria-label="Delete ${esc(s.name)}">✕</button>
         </div>
       </div>`).join('');
   }
@@ -718,10 +869,20 @@
     const s = findSku(id);
     if (!s) return;
     s.status = status;
-    if (status !== 'in_stock') {
+    if (status === 'out_of_stock') {
       STORES.forEach(store => { delete carts[store.id][id]; });
     }
+    persist();
     renderAll();
+  }
+
+  function deleteSku(id) {
+    const s = findSku(id);
+    skus = skus.filter(x => x.id !== id);
+    STORES.forEach(store => { delete carts[store.id][id]; });
+    persist();
+    renderAll();
+    if (s) flashNote('hubFlash', `${s.name} removed from catalog.`);
   }
 
   // ---------------------------------------------------------------
@@ -745,16 +906,20 @@
     const category = document.getElementById('newSkuCategory').value.trim() || 'General';
     const unit = document.getElementById('newSkuUnit').value.trim() || 'pack';
     const status = document.getElementById('newSkuStatus').value;
-    newSkuCounter += 1;
-    skus.push({ id: 'sku-custom-' + newSkuCounter, name, category, unit, status });
+    const id = 'sku-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+    skus.push({ id, name, category, unit, status });
     closeAddSku();
+    persist();
     renderAll();
     flashNote('hubFlash', `${name} added to the catalog.`);
   }
 
   // ---------------------------------------------------------------
-  // Wire up + initial render
+  // Wire up + init
   // ---------------------------------------------------------------
+  loadState();
+  persist(); // seed initial data to localStorage
+
   document.getElementById('storeSelect').addEventListener('change', e => {
     currentStoreId = e.target.value;
     renderAll();
@@ -769,6 +934,8 @@
   document.getElementById('addSkuModal').addEventListener('click', e => {
     if (e.target.id === 'addSkuModal') closeAddSku();
   });
+  // Enter key in modal
+  document.getElementById('newSkuName').addEventListener('keydown', e => { if (e.key === 'Enter') confirmAddSku(); });
 
   renderAll();
 </script>
