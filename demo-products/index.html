@@ -1,698 +1,776 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Indent & Reconciliation App</title>
-  <meta name="description" content="Internal indent and reconciliation tool for FMCG retail ordering between a central hub and retail stores." />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-          colors: {
-            brand: {
-              50: '#eef7ff', 100: '#d9edff', 200: '#bce0ff', 300: '#8eccff',
-              400: '#53b0ff', 500: '#2b8dff', 600: '#0c6cf5', 700: '#0557e1',
-              800: '#0a47b6', 900: '#0f3e8f', 950: '#0c2757',
-            },
-            hub: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' },
-            store: { 50: '#faf5ff', 100: '#f3e8ff', 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce' },
-          },
-        },
-      },
-    };
-  </script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    body { font-family: 'Inter', system-ui, sans-serif; background: #f1f5f9; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light" />
+<title>Dispatch Desk — Store ⇄ Kitchen Demo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
-    /* Smooth view transitions */
-    .view-panel { display: none; animation: fadeSlideIn .3s ease; }
-    .view-panel.active { display: block; }
-    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  :root {
+    --ink: #16211D;
+    --ink-soft: #5B6660;
+    --surface: #EAEFE9;
+    --card: #FCFBF7;
+    --card-line: #DCE3DB;
 
-    /* Toggle pill animation */
-    .role-toggle-track { position: relative; }
-    .role-toggle-indicator {
-      position: absolute; top: 4px; bottom: 4px; border-radius: 9999px;
-      transition: left .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1), background .35s ease;
-      pointer-events: none; z-index: 0;
-    }
-    .role-toggle-btn { position: relative; z-index: 1; transition: color .25s ease; }
+    --accent: #E07B1E;
+    --accent-solid: #A6480A;
+    --accent-solid-hover: #8A3B08;
 
-    /* Badge pulse */
-    @keyframes pulse-ring { 0% { transform: scale(.8); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
-    .badge-pulse::before {
-      content: ''; position: absolute; inset: -3px; border-radius: 9999px;
-      background: inherit; animation: pulse-ring 1.8s ease-out infinite;
-    }
+    --pending: #3E6B8A; --pending-bg: #E2ECF1;
+    --hold: #B9791A;    --hold-bg: #FBEED9;
+    --transit: #1D7A8C; --transit-bg: #DCEFEF;
+    --good: #2F7A4F;    --good-bg: #E3F0E6;
+    --bad: #B23A2E;     --bad-bg: #F8E2DF;
 
-    /* Card hover lift */
-    .card-lift { transition: transform .2s ease, box-shadow .2s ease; }
-    .card-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,.1); }
+    --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
 
-    /* Number input styling */
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { height: 32px; }
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(22,33,29,0.06), 0 6px 18px rgba(22,33,29,0.08);
+  }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  * { box-sizing: border-box; }
+  h1,h2,h3,p { margin: 0; }
+  button, input, select { font-family: inherit; }
 
-    /* Toast */
-    .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); opacity: 0;
-      transition: transform .4s cubic-bezier(.4,0,.2,1), opacity .4s ease;
-      z-index: 9999; pointer-events: none;
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    background: var(--surface);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
 
-    /* Store selector dropdown */
-    .store-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M4.47 5.97a.75.75 0 0 1 1.06 0L8 8.44l2.47-2.47a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 0 1 0-1.06z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .75rem center; padding-right: 2.5rem; }
-  </style>
+  /* ---------- Header ---------- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    padding: 16px 28px;
+    background: var(--card);
+    border-bottom: 1.5px solid var(--card-line);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 40px; height: 40px; flex: none;
+    border: 2.5px solid var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 15px;
+    color: var(--accent);
+    transform: rotate(-4deg);
+  }
+  .brand-text h1 {
+    font-family: var(--font-display); font-weight: 600; font-size: 20px;
+    text-transform: uppercase; letter-spacing: .02em;
+  }
+  .brand-text p { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+  .view-toggle { display: flex; background: var(--surface); border-radius: 10px; padding: 4px; border: 1.5px solid var(--card-line); }
+  .view-toggle button {
+    font-family: var(--font-display); text-transform: uppercase; letter-spacing: .04em;
+    font-size: 12.5px; font-weight: 600;
+    padding: 9px 16px; border-radius: 7px; border: none;
+    background: transparent; color: var(--ink-soft); cursor: pointer;
+  }
+  .view-toggle button.active { background: var(--ink); color: #fff; }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 26px 28px 60px; }
+  .view { display: none; }
+  .view.active { display: block; animation: fadein .25s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .panel-heading { margin-bottom: 14px; }
+  .panel-heading h2 {
+    font-family: var(--font-display); text-transform: uppercase; letter-spacing: .03em;
+    font-size: 17px; margin-bottom: 4px;
+  }
+  .panel-heading p { font-size: 13px; color: var(--ink-soft); }
+  .panel-heading-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+
+  .panel { background: var(--card); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 32px; }
+  .requests-section { margin-bottom: 36px; }
+  .empty-note { color: var(--ink-soft); font-size: 13.5px; font-style: italic; }
+
+  /* ---------- Store controls ---------- */
+  .store-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .store-picker { display: flex; align-items: center; gap: 10px; }
+  .store-picker label {
+    font-family: var(--font-display); text-transform: uppercase; letter-spacing: .05em;
+    font-size: 12px; color: var(--ink-soft);
+  }
+  .store-picker select {
+    font-weight: 600; font-size: 14px;
+    padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--ink);
+    background: var(--card); color: var(--ink); cursor: pointer;
+  }
+  .flash-note { font-size: 13px; color: var(--good); font-weight: 600; opacity: 0; transition: opacity .2s ease; }
+  .flash-note.show { opacity: 1; }
+
+  /* ---------- Store layout ---------- */
+  .store-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; margin-bottom: 36px; }
+  @media (max-width: 860px) {
+    .store-layout { grid-template-columns: 1fr; }
+    .cart-panel { position: static !important; }
+  }
+
+  .sku-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+  .sku-card {
+    background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius);
+    padding: 14px; display: flex; flex-direction: column; gap: 8px; min-height: 128px;
+    transition: box-shadow .15s ease, transform .15s ease;
+  }
+  .sku-card:not(.is-disabled):hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .sku-card.is-disabled { opacity: .72; }
+  .sku-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .sku-cat { font-family: var(--font-display); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+  .sku-name { font-weight: 600; font-size: 15px; line-height: 1.3; }
+  .sku-unit { font-size: 12px; color: var(--ink-soft); font-family: var(--font-mono); }
+  .sku-note { font-size: 12px; color: var(--ink-soft); font-style: italic; margin-top: auto; padding-top: 6px; }
+
+  .qty-stepper { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 6px; }
+  .qty-btn {
+    width: 30px; height: 30px; border-radius: 6px; border: 1.5px solid var(--ink);
+    background: var(--card); color: var(--ink); font-size: 16px; line-height: 1; font-family: var(--font-mono);
+    cursor: pointer;
+  }
+  .qty-btn:hover { background: var(--ink); color: var(--card); }
+  .qty-value { font-family: var(--font-mono); font-weight: 600; min-width: 20px; text-align: center; }
+
+  /* ---------- Ticket (shared: cart + request cards) ---------- */
+  .ticket { position: relative; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px 16px; }
+  .ticket-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .ticket-seq { font-family: var(--font-mono); font-weight: 600; font-size: 13px; color: var(--ink-soft); }
+  .ticket-store { font-family: var(--font-display); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; font-size: 14px; }
+  .ticket-tear { margin: 14px -20px; border-top: 2px dashed var(--card-line); }
+  .ticket-body { min-height: 20px; }
+  .ticket-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .ticket-time { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); }
+  .ticket-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .ticket-row, .cart-row, .manifest-row { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; }
+  .ticket-leader, .cart-leader, .manifest-leader { flex: 1; border-bottom: 2px dotted var(--card-line); margin-bottom: 4px; min-width: 12px; }
+  .ticket-item-name, .cart-name, .manifest-name { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ticket-item-qty, .cart-qty, .manifest-qty { font-family: var(--font-mono); font-weight: 600; font-size: 14px; white-space: nowrap; }
+  .ticket-item-qty small, .cart-qty small, .manifest-qty small { font-weight: 400; color: var(--ink-soft); font-size: 11px; }
+
+  .cart-panel { position: sticky; top: 96px; }
+  .cart-count { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); }
+  .cart-remove { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 14px; padding: 2px 6px; }
+  .cart-remove:hover { color: var(--bad); }
+  .cart-foot { margin-top: 14px; }
+
+  .ticket-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    font-weight: 600; font-size: 13.5px;
+    padding: 10px 16px; border-radius: 8px; border: 1.5px solid transparent;
+    cursor: pointer; transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .btn-accent { background: var(--accent-solid); color: #fff; border-color: var(--accent-solid); }
+  .btn-accent:hover { background: var(--accent-solid-hover); border-color: var(--accent-solid-hover); }
+  .btn-accent:disabled { background: var(--card-line); border-color: var(--card-line); color: var(--ink-soft); cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--card-line); }
+  .btn-ghost:hover { border-color: var(--ink); }
+  .btn-sm { padding: 6px 12px; font-size: 12.5px; }
+  .btn-block { width: 100%; }
+
+  /* ---------- Badges (status stamps) ---------- */
+  .badge {
+    display: inline-block; font-family: var(--font-display); font-size: 11px; font-weight: 600;
+    letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 4px;
+    border: 1.5px solid currentColor; transform: rotate(-2deg); white-space: nowrap;
+  }
+  .badge-good { color: var(--good); background: var(--good-bg); }
+  .badge-pending { color: var(--pending); background: var(--pending-bg); }
+  .badge-hold { color: var(--hold); background: var(--hold-bg); }
+  .badge-transit { color: var(--transit); background: var(--transit-bg); }
+  .badge-bad { color: var(--bad); background: var(--bad-bg); }
+
+  /* ---------- Hub: stats ---------- */
+  .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .stat-tile { background: var(--card); border-radius: var(--radius); border-top: 4px solid var(--ink); padding: 16px; box-shadow: var(--shadow); }
+  .stat-tile.stat-pending { border-top-color: var(--pending); }
+  .stat-tile.stat-hold { border-top-color: var(--hold); }
+  .stat-tile.stat-bad { border-top-color: var(--bad); }
+  .stat-tile.stat-neutral { border-top-color: var(--accent); }
+  .stat-num { font-family: var(--font-mono); font-size: 28px; font-weight: 600; }
+  .stat-label { font-family: var(--font-display); text-transform: uppercase; font-size: 11px; letter-spacing: .06em; color: var(--ink-soft); margin-top: 4px; }
+
+  /* ---------- Hub: SKU catalog table ---------- */
+  .sku-table-head, .sku-table-row {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1.3fr; gap: 12px; align-items: center; padding: 10px 14px;
+  }
+  .sku-table-head { font-family: var(--font-display); text-transform: uppercase; font-size: 11px; letter-spacing: .05em; color: var(--ink-soft); border-bottom: 1.5px solid var(--ink); }
+  .sku-table-row { border-bottom: 1px solid var(--card-line); }
+  .sku-table-row:last-child { border-bottom: none; }
+  .field-name { font-weight: 600; }
+  .field-label { display: none; }
+  .status-select {
+    font-weight: 600; font-size: 13px; padding: 6px 8px; border-radius: 6px;
+    border: 1.5px solid var(--card-line); background: var(--card); width: 100%; cursor: pointer;
+  }
+  @media (max-width: 620px) {
+    .sku-table-head { display: none; }
+    .sku-table-row { grid-template-columns: 1fr 1fr; row-gap: 6px; padding: 12px 14px; }
+    .field-name { grid-column: 1 / -1; }
+    .field-meta .field-label { display: inline; color: var(--ink-soft); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; margin-right: 4px; }
+    .field-status { grid-column: 1 / -1; }
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(22,33,29,0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .modal-overlay.hidden { display: none; }
+  .modal-card { position: relative; background: var(--card); border-radius: 14px; padding: 26px 24px 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.28); }
+  .modal-tab {
+    position: absolute; top: -14px; left: 24px; background: var(--accent-solid); color: #fff;
+    font-family: var(--font-display); font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+    padding: 4px 10px; border-radius: 5px; transform: rotate(-2deg);
+  }
+  .modal-card h3 { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .02em; font-size: 17px; margin-bottom: 18px; }
+  .field-block { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 14px; }
+  .field-block input, .field-block select {
+    display: block; width: 100%; margin-top: 6px; padding: 9px 10px; border-radius: 7px;
+    border: 1.5px solid var(--card-line); font-size: 14px; color: var(--ink); background: var(--card);
+  }
+  .modal-row { display: flex; gap: 12px; }
+  .modal-row .field-block { flex: 1; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+
+  /* ---------- Footer & a11y ---------- */
+  .page-footer { text-align: center; font-size: 12px; color: var(--ink-soft); padding: 6px 20px 24px; }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  @media (max-width: 560px) {
+    .topbar { padding: 14px 16px; }
+    .wrap { padding: 20px 16px 50px; }
+    .brand-text h1 { font-size: 17px; }
+  }
+</style>
 </head>
-<body class="min-h-screen">
+<body>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="toast">
-    <div class="bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-2xl text-sm font-medium flex items-center gap-2">
-      <span id="toast-icon">✓</span>
-      <span id="toast-msg"></span>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">DD</div>
+      <div class="brand-text">
+        <h1>Dispatch Desk</h1>
+        <p>Central kitchen ⇄ store indent tracker — demo</p>
+      </div>
     </div>
-  </div>
+    <nav class="view-toggle" role="tablist">
+      <button type="button" data-view="store" class="active" role="tab" aria-selected="true">Store View</button>
+      <button type="button" data-view="hub" role="tab" aria-selected="false">Kitchen View</button>
+    </nav>
+  </header>
 
-  <!-- App Shell -->
-  <div class="max-w-md mx-auto min-h-screen bg-white shadow-xl shadow-gray-200/80 relative">
+  <main class="wrap">
 
-    <!-- Header -->
-    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-      <div class="px-4 pt-4 pb-2">
-        <div class="flex items-center justify-between mb-3">
+    <!-- ===================== VIEW A — STORE ===================== -->
+    <section id="view-store" class="view active" aria-hidden="false">
+
+      <div class="store-controls">
+        <div class="store-picker">
+          <label for="storeSelect">Ordering as</label>
+          <select id="storeSelect"></select>
+        </div>
+        <span class="flash-note" id="storeFlash"></span>
+      </div>
+
+      <div class="store-layout">
+        <div class="catalog-panel">
+          <div class="panel-heading">
+            <h2>Today's Catalog</h2>
+            <p>Sample of the 100‑SKU range — tap + to add an item to your request.</p>
+          </div>
+          <div class="sku-grid" id="skuGrid"></div>
+        </div>
+
+        <aside class="cart-panel ticket">
+          <div class="ticket-head">
+            <span class="ticket-store">New Request</span>
+            <span class="cart-count" id="cartCount"></span>
+          </div>
+          <div class="ticket-tear"></div>
+          <div class="ticket-body" id="cartList"></div>
+          <div class="cart-foot">
+            <button type="button" class="btn btn-accent btn-block" id="submitRequestBtn" disabled>Submit Request</button>
+          </div>
+        </aside>
+      </div>
+
+      <div class="requests-section">
+        <div class="panel-heading">
+          <h2>My Requests</h2>
+          <p>Status updates from the central kitchen land here.</p>
+        </div>
+        <div class="ticket-rail" id="myRequestsList"></div>
+      </div>
+    </section>
+
+    <!-- ===================== VIEW B — CENTRAL KITCHEN ===================== -->
+    <section id="view-hub" class="view" aria-hidden="true">
+
+      <div class="stats-bar" id="statsBar"></div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2>Today's Combined Demand</h2>
+          <p>Every pending and on‑hold request, totalled by item — pack once, not five times.</p>
+        </div>
+        <div id="demandList"></div>
+      </div>
+
+      <div class="requests-section">
+        <div class="panel-heading">
+          <h2>Needs Action</h2>
+          <p>New indents from the stores, oldest first.</p>
+        </div>
+        <div class="ticket-rail" id="hubNeedsAction"></div>
+      </div>
+
+      <div class="requests-section">
+        <div class="panel-heading">
+          <h2>Completed Today</h2>
+          <p>Dispatched and received indents.</p>
+        </div>
+        <div class="ticket-rail" id="hubCompleted"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading panel-heading-row">
           <div>
-            <h1 id="main-heading" class="text-lg font-800 text-gray-900 tracking-tight">Indent & Recon</h1>
-            <p class="text-[11px] text-gray-400 font-medium tracking-wide uppercase mt-0.5">FMCG Order Management</p>
+            <h2>SKU Catalog</h2>
+            <p>Flip an item's status and every store sees it instantly.</p>
           </div>
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/25">
-            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-          </div>
+          <button type="button" class="btn btn-accent" id="addSkuBtn">+ Add SKU</button>
         </div>
-
-        <!-- Role Toggle -->
-        <div class="role-toggle-track bg-gray-100 rounded-full p-1 flex mb-2" id="role-toggle">
-          <div class="role-toggle-indicator bg-white shadow-md" id="toggle-indicator"></div>
-          <button onclick="switchView('hub')" id="btn-hub" class="role-toggle-btn flex-1 text-center py-2 text-xs font-semibold rounded-full transition-colors">
-            <span class="mr-1">🏢</span> Central Hub
-          </button>
-          <button onclick="switchView('store')" id="btn-store" class="role-toggle-btn flex-1 text-center py-2 text-xs font-semibold rounded-full transition-colors">
-            <span class="mr-1">🏪</span> Store View
-          </button>
+        <div class="sku-table-head">
+          <span>Item</span><span>Category</span><span>Unit</span><span>Status</span>
         </div>
+        <div id="hubSkuTable"></div>
+        <span class="flash-note" id="hubFlash"></span>
       </div>
-    </header>
+    </section>
 
-    <!-- ===================== CENTRAL HUB VIEW ===================== -->
-    <div id="view-hub" class="view-panel active">
-      <div class="px-4 py-4 space-y-5">
+  </main>
 
-        <!-- Add SKU Section -->
-        <section>
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-7 h-7 rounded-lg bg-brand-100 flex items-center justify-center">
-              <svg class="w-3.5 h-3.5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            </div>
-            <h2 class="text-sm font-bold text-gray-800">Add New SKU</h2>
-          </div>
-          <form id="add-sku-form" onsubmit="addSKU(event)" class="flex gap-2">
-            <input type="text" id="sku-name-input" placeholder="e.g. Butter Cookies 250g" required
-              class="flex-1 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400 transition" />
-            <button type="submit" id="add-sku-btn"
-              class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-brand-600/25 active:scale-95 transition-all whitespace-nowrap">
-              + Add
-            </button>
-          </form>
-        </section>
+  <p class="page-footer">Demo prototype — Store View and Kitchen View share this tab's memory only, so data resets on reload. No real orders are sent.</p>
 
-        <!-- Manage Catalog -->
-        <section>
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center">
-                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-              </div>
-              <h2 class="text-sm font-bold text-gray-800">Product Catalog</h2>
-            </div>
-            <span id="sku-count" class="text-[11px] font-semibold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full"></span>
-          </div>
-          <div id="catalog-list" class="space-y-2"></div>
-        </section>
-
-        <!-- Pending Orders -->
-        <section>
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
-                <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </div>
-              <h2 class="text-sm font-bold text-gray-800">Pending Orders</h2>
-            </div>
-            <span id="pending-count" class="relative text-[11px] font-bold text-white bg-amber-500 px-2.5 py-1 rounded-full badge-pulse"></span>
-          </div>
-          <div id="pending-orders" class="space-y-3"></div>
-        </section>
-
-        <!-- Dispatched History (Hub side) -->
-        <section>
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
-              <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <h2 class="text-sm font-bold text-gray-800">Dispatch History</h2>
-          </div>
-          <div id="dispatched-history" class="space-y-2"></div>
-        </section>
-
+  <!-- ===================== ADD SKU MODAL ===================== -->
+  <div class="modal-overlay hidden" id="addSkuModal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="addSkuTitle">
+      <span class="modal-tab">New Item</span>
+      <h3 id="addSkuTitle">Add SKU to catalog</h3>
+      <label class="field-block">Item name
+        <input type="text" id="newSkuName" placeholder="e.g. Schezwan Fried Rice" maxlength="60">
+      </label>
+      <div class="modal-row">
+        <label class="field-block">Category
+          <input type="text" id="newSkuCategory" placeholder="e.g. Rice" maxlength="30">
+        </label>
+        <label class="field-block">Unit
+          <input type="text" id="newSkuUnit" placeholder="e.g. box" maxlength="20">
+        </label>
+      </div>
+      <label class="field-block">Starting status
+        <select id="newSkuStatus">
+          <option value="in_stock">In Stock</option>
+          <option value="in_process">In Process</option>
+          <option value="out_of_stock">Out of Stock</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancelAddSku">Cancel</button>
+        <button type="button" class="btn btn-accent" id="confirmAddSku">Add SKU</button>
       </div>
     </div>
-
-    <!-- ===================== STORE VIEW ===================== -->
-    <div id="view-store" class="view-panel">
-      <div class="px-4 py-4 space-y-5">
-
-        <!-- Store Selector -->
-        <section>
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center">
-              <svg class="w-3.5 h-3.5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-            </div>
-            <h2 class="text-sm font-bold text-gray-800">Select Store</h2>
-          </div>
-          <select id="store-selector" onchange="renderStoreView()" class="store-select w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition bg-white">
-            <option value="store-1">🏪 Store 1 — MG Road</option>
-            <option value="store-2">🏪 Store 2 — Koramangala</option>
-            <option value="store-3">🏪 Store 3 — Indiranagar</option>
-            <option value="store-4">🏪 Store 4 — Whitefield</option>
-            <option value="store-5">🏪 Store 5 — Jayanagar</option>
-          </select>
-        </section>
-
-        <!-- Order Form -->
-        <section>
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded-lg bg-brand-100 flex items-center justify-center">
-                <svg class="w-3.5 h-3.5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
-              </div>
-              <h2 class="text-sm font-bold text-gray-800">Place Indent Order</h2>
-            </div>
-          </div>
-          <div id="order-form" class="space-y-2"></div>
-          <button onclick="placeOrder()" id="place-order-btn"
-            class="mt-4 w-full bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white text-sm font-bold py-3 rounded-xl shadow-lg shadow-brand-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-            Submit Indent
-          </button>
-        </section>
-
-        <!-- Incoming Dispatches (to receive) -->
-        <section>
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center">
-                <svg class="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
-              </div>
-              <h2 class="text-sm font-bold text-gray-800">Incoming Dispatches</h2>
-            </div>
-            <span id="incoming-count" class="relative text-[11px] font-bold text-white bg-green-500 px-2.5 py-1 rounded-full badge-pulse"></span>
-          </div>
-          <div id="incoming-dispatches" class="space-y-3"></div>
-        </section>
-
-        <!-- Order History (Store side) -->
-        <section>
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center">
-              <svg class="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-            </div>
-            <h2 class="text-sm font-bold text-gray-800">Completed Orders</h2>
-          </div>
-          <div id="completed-orders" class="space-y-2"></div>
-        </section>
-
-      </div>
-    </div>
-
-    <!-- Bottom safe-area spacer -->
-    <div class="h-6"></div>
-
   </div>
 
-  <!-- ===================== JAVASCRIPT ===================== -->
-  <script>
-    // ── Keys ──────────────────────────────────────────────
-    const KEYS = { skus: 'ir_skus', orders: 'ir_orders' };
+<script>
+  // ---------------------------------------------------------------
+  // Data
+  // ---------------------------------------------------------------
+  const STORES = [
+    { id: 's1', name: 'Store 1' },
+    { id: 's2', name: 'Store 2' },
+    { id: 's3', name: 'Store 3' },
+    { id: 's4', name: 'Store 4' },
+    { id: 's5', name: 'Store 5' },
+  ];
 
-    // ── Store name map ───────────────────────────────────
-    const STORE_NAMES = {
-      'store-1': 'Store 1 — MG Road',
-      'store-2': 'Store 2 — Koramangala',
-      'store-3': 'Store 3 — Indiranagar',
-      'store-4': 'Store 4 — Whitefield',
-      'store-5': 'Store 5 — Jayanagar',
-    };
+  let skus = [
+    { id: 'dal-makhani',      name: 'Dal Makhani',            category: 'Curries',   unit: 'pack',   status: 'in_stock' },
+    { id: 'paneer-tikka',     name: 'Paneer Tikka Masala',    category: 'Curries',   unit: 'pack',   status: 'in_stock' },
+    { id: 'butter-chicken',   name: 'Butter Chicken',         category: 'Curries',   unit: 'pack',   status: 'in_process' },
+    { id: 'mixed-veg',        name: 'Mixed Veg Curry',        category: 'Curries',   unit: 'pack',   status: 'in_stock' },
+    { id: 'chole-bhature',    name: 'Chole Bhature',          category: 'Curries',   unit: 'pack',   status: 'in_process' },
+    { id: 'veg-biryani',      name: 'Veg Biryani',            category: 'Rice',      unit: 'box',    status: 'in_stock' },
+    { id: 'chicken-biryani',  name: 'Chicken Biryani',        category: 'Rice',      unit: 'box',    status: 'out_of_stock' },
+    { id: 'jeera-rice',       name: 'Jeera Rice',             category: 'Rice',      unit: 'box',    status: 'in_stock' },
+    { id: 'rajma-chawal',     name: 'Rajma Chawal',           category: 'Rice',      unit: 'box',    status: 'in_stock' },
+    { id: 'tandoori-roti',    name: 'Tandoori Roti (6 pc)',   category: 'Breads',    unit: 'pack',   status: 'in_stock' },
+    { id: 'butter-naan',      name: 'Butter Naan (4 pc)',     category: 'Breads',    unit: 'pack',   status: 'in_stock' },
+    { id: 'curd-cup',         name: 'Curd Cup (200g)',        category: 'Sides',     unit: 'cup',    status: 'in_stock' },
+    { id: 'green-salad',      name: 'Green Salad Pack',       category: 'Sides',     unit: 'pack',   status: 'in_stock' },
+    { id: 'papad',            name: 'Papad (4 pc)',           category: 'Sides',     unit: 'pack',   status: 'out_of_stock' },
+    { id: 'gulab-jamun',      name: 'Gulab Jamun (2 pc)',     category: 'Desserts',  unit: 'pack',   status: 'in_stock' },
+    { id: 'rasmalai',         name: 'Rasmalai (2 pc)',        category: 'Desserts',  unit: 'pack',   status: 'in_process' },
+    { id: 'masala-chaas',     name: 'Masala Chaas (200ml)',   category: 'Beverages', unit: 'bottle', status: 'in_stock' },
+    { id: 'packaged-water',   name: 'Packaged Water (500ml)', category: 'Beverages', unit: 'bottle', status: 'in_stock' },
+  ];
 
-    // ── Helpers ───────────────────────────────────────────
-    const $ = (id) => document.getElementById(id);
-    const load = (key) => JSON.parse(localStorage.getItem(key) || 'null');
-    const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  let reqSeq = 0;
+  function mkReq(storeId, itemsObj, status, time) {
+    reqSeq += 1;
+    const items = Object.entries(itemsObj).map(([skuId, qty]) => ({ skuId, qty }));
+    return { id: 'req' + reqSeq, seq: reqSeq, storeId, items, status, time };
+  }
 
-    function showToast(msg, icon = '✓') {
-      $('toast-msg').textContent = msg;
-      $('toast-icon').textContent = icon;
-      $('toast').classList.add('show');
-      setTimeout(() => $('toast').classList.remove('show'), 2200);
-    }
+  let requests = [
+    mkReq('s1', { 'dal-makhani': 20, 'paneer-tikka': 10 }, 'pending', '9:15 AM'),
+    mkReq('s2', { 'paneer-tikka': 15 }, 'pending', '9:40 AM'),
+    mkReq('s3', { 'jeera-rice': 12, 'tandoori-roti': 25 }, 'on_hold', '10:05 AM'),
+    mkReq('s4', { 'gulab-jamun': 30, 'masala-chaas': 20 }, 'dispatched', '8:50 AM'),
+    mkReq('s5', { 'rajma-chawal': 10, 'curd-cup': 15 }, 'received', '8:20 AM'),
+  ];
 
-    // ── Seed Data ─────────────────────────────────────────
-    function seedIfEmpty() {
-      if (!load(KEYS.skus)) {
-        const skus = [
-          { id: uid(), name: 'Masala Peanuts 200g', status: 'In Stock' },
-          { id: uid(), name: 'Choco-Chip Cookies', status: 'In Stock' },
-          { id: uid(), name: 'Bhujia Sev 500g', status: 'In Stock' },
-          { id: uid(), name: 'Mango Juice 1L', status: 'Out of Stock' },
-          { id: uid(), name: 'Dairy Milk Silk 150g', status: 'In Stock' },
-        ];
-        save(KEYS.skus, skus);
-      }
-      if (!load(KEYS.orders)) save(KEYS.orders, []);
-    }
+  let carts = {};
+  STORES.forEach(s => { carts[s.id] = {}; });
 
-    // ── View Switching ────────────────────────────────────
-    let currentView = 'hub';
+  let currentStoreId = STORES[0].id;
+  let newSkuCounter = 0;
 
-    function switchView(view) {
-      currentView = view;
-      $('view-hub').classList.toggle('active', view === 'hub');
-      $('view-store').classList.toggle('active', view === 'store');
+  const SKU_STATUS = {
+    in_stock:     { label: 'In Stock',     cls: 'good' },
+    in_process:   { label: 'In Process',   cls: 'hold' },
+    out_of_stock: { label: 'Out of Stock', cls: 'bad' },
+  };
+  const REQ_STATUS = {
+    pending:    { label: 'Pending',    cls: 'pending' },
+    on_hold:    { label: 'On Hold',    cls: 'hold' },
+    dispatched: { label: 'Dispatched', cls: 'transit' },
+    received:   { label: 'Received',   cls: 'good' },
+  };
 
-      const indicator = $('toggle-indicator');
-      const btnHub = $('btn-hub');
-      const btnStore = $('btn-store');
+  // ---------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------
+  function esc(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+  function findSku(id) { return skus.find(s => s.id === id); }
+  function badge(map, key) {
+    const m = map[key];
+    return `<span class="badge badge-${m.cls}">${m.label}</span>`;
+  }
+  function flashNote(elId, msg) {
+    const el = document.getElementById(elId);
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2600);
+  }
 
-      if (view === 'hub') {
-        indicator.style.left = '4px';
-        indicator.style.width = btnHub.offsetWidth + 'px';
-        indicator.style.background = '#fff';
-        btnHub.classList.add('text-gray-900');
-        btnHub.classList.remove('text-gray-500');
-        btnStore.classList.add('text-gray-500');
-        btnStore.classList.remove('text-gray-900');
-      } else {
-        indicator.style.left = btnHub.offsetWidth + 4 + 'px';
-        indicator.style.width = btnStore.offsetWidth + 'px';
-        indicator.style.background = '#fff';
-        btnStore.classList.add('text-gray-900');
-        btnStore.classList.remove('text-gray-500');
-        btnHub.classList.add('text-gray-500');
-        btnHub.classList.remove('text-gray-900');
-      }
+  // ---------------------------------------------------------------
+  // View switching
+  // ---------------------------------------------------------------
+  function setView(view) {
+    document.querySelectorAll('.view-toggle button').forEach(b => {
+      const active = b.dataset.view === view;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    const storeSec = document.getElementById('view-store');
+    const hubSec = document.getElementById('view-hub');
+    storeSec.classList.toggle('active', view === 'store');
+    storeSec.setAttribute('aria-hidden', view === 'store' ? 'false' : 'true');
+    hubSec.classList.toggle('active', view === 'hub');
+    hubSec.setAttribute('aria-hidden', view === 'hub' ? 'false' : 'true');
+    renderAll();
+  }
 
-      renderAll();
-    }
+  // ---------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------
+  function renderAll() {
+    renderStoreSelect();
+    renderSkuGrid();
+    renderCart();
+    renderMyRequests();
+    renderStatsBar();
+    renderDemand();
+    renderHubRequests();
+    renderHubSkuTable();
+  }
 
-    // ── Add SKU ───────────────────────────────────────────
-    function addSKU(e) {
-      e.preventDefault();
-      const input = $('sku-name-input');
-      const name = input.value.trim();
-      if (!name) return;
-      const skus = load(KEYS.skus);
-      skus.push({ id: uid(), name, status: 'In Stock' });
-      save(KEYS.skus, skus);
-      input.value = '';
-      showToast(`"${name}" added to catalog`, '📦');
-      renderAll();
-    }
+  function renderStoreSelect() {
+    const sel = document.getElementById('storeSelect');
+    sel.innerHTML = STORES.map(s => `<option value="${s.id}" ${s.id === currentStoreId ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
+  }
 
-    // ── Toggle SKU Status ─────────────────────────────────
-    function toggleStatus(skuId) {
-      const skus = load(KEYS.skus);
-      const sku = skus.find(s => s.id === skuId);
-      if (sku) {
-        sku.status = sku.status === 'In Stock' ? 'Out of Stock' : 'In Stock';
-        save(KEYS.skus, skus);
-        showToast(`${sku.name}: ${sku.status}`, sku.status === 'In Stock' ? '🟢' : '🔴');
-        renderAll();
-      }
-    }
+  function renderSkuGrid() {
+    const grid = document.getElementById('skuGrid');
+    const cart = carts[currentStoreId];
+    grid.innerHTML = skus.map(s => {
+      const qty = cart[s.id] || 0;
+      const orderable = s.status === 'in_stock';
+      return `
+      <div class="sku-card ${orderable ? '' : 'is-disabled'}">
+        <div class="sku-top">
+          <span class="sku-cat">${esc(s.category)}</span>
+          ${badge(SKU_STATUS, s.status)}
+        </div>
+        <div class="sku-name">${esc(s.name)}</div>
+        <div class="sku-unit">per ${esc(s.unit)}</div>
+        ${orderable ? `
+          <div class="qty-stepper">
+            <button type="button" class="qty-btn" onclick="changeQty('${s.id}', -1)" aria-label="Decrease quantity">−</button>
+            <span class="qty-value">${qty}</span>
+            <button type="button" class="qty-btn" onclick="changeQty('${s.id}', 1)" aria-label="Increase quantity">+</button>
+          </div>` : `
+          <div class="sku-note">${s.status === 'in_process' ? 'Ordering paused while prepping' : 'Currently unavailable'}</div>`}
+      </div>`;
+    }).join('');
+  }
 
-    // ── Delete SKU ────────────────────────────────────────
-    function deleteSKU(skuId) {
-      let skus = load(KEYS.skus);
-      const sku = skus.find(s => s.id === skuId);
-      skus = skus.filter(s => s.id !== skuId);
-      save(KEYS.skus, skus);
-      showToast(`"${sku?.name}" removed`, '🗑️');
-      renderAll();
-    }
+  function changeQty(skuId, delta) {
+    const s = findSku(skuId);
+    if (!s || s.status !== 'in_stock') return;
+    const cart = carts[currentStoreId];
+    const next = Math.max(0, (cart[skuId] || 0) + delta);
+    if (next === 0) delete cart[skuId]; else cart[skuId] = next;
+    renderSkuGrid();
+    renderCart();
+  }
 
-    // ── Place Order (Store) ───────────────────────────────
-    function placeOrder() {
-      const skus = load(KEYS.skus);
-      const orders = load(KEYS.orders);
-      const storeId = $('store-selector').value;
-      const items = [];
-
-      skus.forEach(sku => {
-        if (sku.status !== 'In Stock') return;
-        const input = document.querySelector(`[data-order-sku="${sku.id}"]`);
-        if (input) {
-          const qty = parseInt(input.value) || 0;
-          if (qty > 0) items.push({ skuId: sku.id, skuName: sku.name, qtyOrdered: qty, qtyDispatched: null });
-        }
-      });
-
-      if (items.length === 0) {
-        showToast('Add at least 1 item', '⚠️');
-        return;
-      }
-
-      orders.push({
-        id: uid(),
-        storeId,
-        storeName: STORE_NAMES[storeId],
-        items,
-        status: 'pending',       // pending → dispatched → received
-        createdAt: new Date().toISOString(),
-        dispatchedAt: null,
-        receivedAt: null,
-      });
-
-      save(KEYS.orders, orders);
-
-      // Reset inputs
-      document.querySelectorAll('[data-order-sku]').forEach(i => (i.value = 0));
-      showToast('Indent submitted to Hub!', '🚀');
-      renderAll();
-    }
-
-    // ── Dispatch Order (Hub) ──────────────────────────────
-    function dispatchOrder(orderId) {
-      const orders = load(KEYS.orders);
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return;
-
-      order.items.forEach(item => {
-        const input = document.querySelector(`[data-dispatch="${orderId}-${item.skuId}"]`);
-        item.qtyDispatched = input ? (parseInt(input.value) || 0) : item.qtyOrdered;
-      });
-
-      order.status = 'dispatched';
-      order.dispatchedAt = new Date().toISOString();
-      save(KEYS.orders, orders);
-      showToast(`Order dispatched to ${order.storeName}`, '🚚');
-      renderAll();
-    }
-
-    // ── Receive Order (Store) ─────────────────────────────
-    function receiveOrder(orderId) {
-      const orders = load(KEYS.orders);
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return;
-      order.status = 'received';
-      order.receivedAt = new Date().toISOString();
-      save(KEYS.orders, orders);
-      showToast('Shipment received & confirmed!', '✅');
-      renderAll();
-    }
-
-    // ── Render: Catalog (Hub) ─────────────────────────────
-    function renderCatalog() {
-      const skus = load(KEYS.skus);
-      $('sku-count').textContent = `${skus.length} SKU${skus.length !== 1 ? 's' : ''}`;
-
-      $('catalog-list').innerHTML = skus.map(sku => {
-        const inStock = sku.status === 'In Stock';
-        return `
-          <div class="card-lift flex items-center justify-between bg-gray-50 rounded-xl p-3 border border-gray-100">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-9 h-9 rounded-lg flex items-center justify-center text-lg shrink-0 ${inStock ? 'bg-emerald-100' : 'bg-red-100'}">
-                ${inStock ? '📦' : '🚫'}
-              </div>
-              <div class="min-w-0">
-                <p class="text-sm font-semibold text-gray-800 truncate">${sku.name}</p>
-                <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider mt-0.5 ${inStock ? 'text-emerald-600' : 'text-red-500'}">
-                  <span class="w-1.5 h-1.5 rounded-full ${inStock ? 'bg-emerald-500' : 'bg-red-500'}"></span>
-                  ${sku.status}
-                </span>
-              </div>
-            </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              <button onclick="toggleStatus('${sku.id}')" title="Toggle status"
-                class="w-8 h-8 rounded-lg flex items-center justify-center text-xs transition ${inStock ? 'bg-red-50 hover:bg-red-100 text-red-500' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}">
-                ${inStock ? '✖' : '✔'}
-              </button>
-              <button onclick="deleteSKU('${sku.id}')" title="Delete SKU"
-                class="w-8 h-8 rounded-lg flex items-center justify-center text-xs bg-gray-100 hover:bg-gray-200 text-gray-400 transition">
-                🗑
-              </button>
-            </div>
-          </div>`;
+  function renderCart() {
+    const cart = carts[currentStoreId];
+    const entries = Object.entries(cart).filter(([, q]) => q > 0);
+    const list = document.getElementById('cartList');
+    document.getElementById('cartCount').textContent = entries.length ? `(${entries.length})` : '';
+    if (!entries.length) {
+      list.innerHTML = `<p class="empty-note">Tap + on any in‑stock item to start today's request.</p>`;
+    } else {
+      list.innerHTML = entries.map(([skuId, qty]) => {
+        const s = findSku(skuId);
+        return `<div class="cart-row">
+          <span class="cart-name">${esc(s.name)}</span>
+          <span class="cart-leader"></span>
+          <span class="cart-qty">${qty} <small>${esc(s.unit)}</small></span>
+          <button type="button" class="cart-remove" onclick="removeFromCart('${s.id}')" aria-label="Remove ${esc(s.name)} from request">✕</button>
+        </div>`;
       }).join('');
     }
+    document.getElementById('submitRequestBtn').disabled = entries.length === 0;
+  }
 
-    // ── Render: Pending Orders (Hub) ──────────────────────
-    function renderPendingOrders() {
-      const orders = load(KEYS.orders);
-      const pending = orders.filter(o => o.status === 'pending');
-      $('pending-count').textContent = pending.length;
-      $('pending-count').style.display = pending.length ? '' : 'none';
+  function removeFromCart(skuId) {
+    delete carts[currentStoreId][skuId];
+    renderSkuGrid();
+    renderCart();
+  }
 
-      if (pending.length === 0) {
-        $('pending-orders').innerHTML = `
-          <div class="text-center py-8 text-gray-300">
-            <div class="text-3xl mb-2">📭</div>
-            <p class="text-xs font-medium">No pending orders</p>
-          </div>`;
-        return;
-      }
+  function submitRequest() {
+    const cart = carts[currentStoreId];
+    const entries = Object.entries(cart).filter(([, q]) => q > 0);
+    if (!entries.length) return;
+    const itemsObj = {};
+    entries.forEach(([skuId, qty]) => { itemsObj[skuId] = qty; });
+    const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    requests.push(mkReq(currentStoreId, itemsObj, 'pending', time));
+    carts[currentStoreId] = {};
+    renderAll();
+    flashNote('storeFlash', 'Request sent to the central kitchen.');
+  }
 
-      $('pending-orders').innerHTML = pending.map(order => {
-        const timeStr = new Date(order.createdAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        const itemRows = order.items.map(item => `
-          <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-            <div class="min-w-0">
-              <p class="text-xs font-medium text-gray-700 truncate">${item.skuName}</p>
-              <p class="text-[10px] text-gray-400">Ordered: <span class="font-bold text-gray-600">${item.qtyOrdered}</span></p>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <label class="text-[10px] text-gray-400">Dispatch:</label>
-              <input type="number" min="0" value="${item.qtyOrdered}" data-dispatch="${order.id}-${item.skuId}"
-                class="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400" />
-            </div>
-          </div>`).join('');
+  function renderMyRequests() {
+    const list = document.getElementById('myRequestsList');
+    const mine = requests.filter(r => r.storeId === currentStoreId).slice().sort((a, b) => b.seq - a.seq);
+    list.innerHTML = mine.length
+      ? mine.map(r => ticketCard(r, { showReceive: true })).join('')
+      : `<p class="empty-note">No requests placed yet today.</p>`;
+  }
 
-        return `
-          <div class="bg-white rounded-2xl border border-amber-200 shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-2.5 flex items-center justify-between">
-              <div>
-                <p class="text-xs font-bold text-amber-800">🏪 ${order.storeName}</p>
-                <p class="text-[10px] text-amber-600/70 mt-0.5">${timeStr}</p>
-              </div>
-              <span class="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full uppercase tracking-wider">Pending</span>
-            </div>
-            <div class="px-4 py-2">${itemRows}</div>
-            <div class="px-4 pb-3">
-              <button onclick="dispatchOrder('${order.id}')"
-                class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl shadow-md shadow-blue-600/25 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                Mark Dispatched
-              </button>
-            </div>
-          </div>`;
-      }).join('');
+  function ticketCard(r, opts) {
+    opts = opts || {};
+    const store = STORES.find(s => s.id === r.storeId);
+    const itemsHtml = r.items.map(it => {
+      const s = findSku(it.skuId);
+      return `<div class="ticket-row">
+        <span class="ticket-item-name">${esc(s ? s.name : 'Unknown item')}</span>
+        <span class="ticket-leader"></span>
+        <span class="ticket-item-qty">${it.qty} <small>${esc(s ? s.unit : '')}</small></span>
+      </div>`;
+    }).join('');
+
+    let actions = '';
+    if (opts.hubActions && r.status === 'pending') {
+      actions = `<button type="button" class="btn btn-accent btn-sm" onclick="hubDispatch('${r.id}')">Dispatch</button>
+                 <button type="button" class="btn btn-ghost btn-sm" onclick="hubHold('${r.id}')">Hold</button>`;
+    } else if (opts.hubActions && r.status === 'on_hold') {
+      actions = `<button type="button" class="btn btn-accent btn-sm" onclick="hubDispatch('${r.id}')">Dispatch</button>
+                 <button type="button" class="btn btn-ghost btn-sm" onclick="hubResume('${r.id}')">Resume</button>`;
+    } else if (opts.showReceive && r.status === 'dispatched') {
+      actions = `<button type="button" class="btn btn-accent btn-sm" onclick="markReceived('${r.id}')">Mark Received</button>`;
     }
 
-    // ── Render: Dispatch History (Hub) ────────────────────
-    function renderDispatchHistory() {
-      const orders = load(KEYS.orders);
-      const dispatched = orders.filter(o => o.status === 'dispatched' || o.status === 'received');
+    return `
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="ticket-seq">№ ${String(r.seq).padStart(3, '0')}</span>
+        <span class="ticket-store">${esc(store ? store.name : '')}</span>
+        ${badge(REQ_STATUS, r.status)}
+      </div>
+      <div class="ticket-tear"></div>
+      <div class="ticket-body">${itemsHtml}</div>
+      <div class="ticket-foot">
+        <span class="ticket-time">${esc(r.time)}</span>
+        <div class="ticket-actions">${actions}</div>
+      </div>
+    </div>`;
+  }
 
-      if (dispatched.length === 0) {
-        $('dispatched-history').innerHTML = `
-          <div class="text-center py-6 text-gray-300">
-            <p class="text-xs font-medium">No dispatch history yet</p>
-          </div>`;
-        return;
-      }
+  function hubDispatch(id) {
+    const r = requests.find(x => x.id === id);
+    if (r) { r.status = 'dispatched'; renderAll(); flashNote('hubFlash', 'Marked as dispatched.'); }
+  }
+  function hubHold(id) {
+    const r = requests.find(x => x.id === id);
+    if (r) { r.status = 'on_hold'; renderAll(); }
+  }
+  function hubResume(id) {
+    const r = requests.find(x => x.id === id);
+    if (r) { r.status = 'pending'; renderAll(); }
+  }
+  function markReceived(id) {
+    const r = requests.find(x => x.id === id);
+    if (r) { r.status = 'received'; renderAll(); flashNote('storeFlash', 'Marked as received. Thanks!'); }
+  }
 
-      $('dispatched-history').innerHTML = dispatched.slice().reverse().map(order => {
-        const isReceived = order.status === 'received';
-        const timeStr = new Date(order.dispatchedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        const itemSummary = order.items.map(i => `${i.skuName} ×${i.qtyDispatched}`).join(', ');
-        return `
-          <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 ${isReceived ? 'bg-emerald-100' : 'bg-blue-100'}">
-              ${isReceived ? '✅' : '🚚'}
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between">
-                <p class="text-xs font-bold text-gray-800">${order.storeName}</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${isReceived ? 'text-emerald-700 bg-emerald-100' : 'text-blue-700 bg-blue-100'}">
-                  ${isReceived ? 'Received' : 'In Transit'}
-                </span>
-              </div>
-              <p class="text-[10px] text-gray-400 mt-0.5">${timeStr}</p>
-              <p class="text-[11px] text-gray-500 mt-1 truncate">${itemSummary}</p>
-            </div>
+  function renderStatsBar() {
+    const pending = requests.filter(r => r.status === 'pending').length;
+    const hold = requests.filter(r => r.status === 'on_hold').length;
+    const oos = skus.filter(s => s.status === 'out_of_stock').length;
+    document.getElementById('statsBar').innerHTML = `
+      <div class="stat-tile stat-pending"><div class="stat-num">${pending}</div><div class="stat-label">Pending</div></div>
+      <div class="stat-tile stat-hold"><div class="stat-num">${hold}</div><div class="stat-label">On Hold</div></div>
+      <div class="stat-tile stat-bad"><div class="stat-num">${oos}</div><div class="stat-label">Out of Stock</div></div>
+      <div class="stat-tile stat-neutral"><div class="stat-num">${STORES.length}</div><div class="stat-label">Active Stores</div></div>`;
+  }
+
+  function renderDemand() {
+    const totals = {};
+    requests.filter(r => r.status === 'pending' || r.status === 'on_hold').forEach(r => {
+      r.items.forEach(it => { totals[it.skuId] = (totals[it.skuId] || 0) + it.qty; });
+    });
+    const rows = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+    const el = document.getElementById('demandList');
+    el.innerHTML = rows.length
+      ? rows.map(([skuId, qty]) => {
+          const s = findSku(skuId);
+          return `<div class="manifest-row">
+            <span class="manifest-name">${esc(s ? s.name : 'Unknown item')}</span>
+            <span class="manifest-leader"></span>
+            <span class="manifest-qty">${qty} <small>${esc(s ? s.unit : '')}</small></span>
           </div>`;
-      }).join('');
+        }).join('')
+      : `<p class="empty-note">No open requests right now — the manifest is clear.</p>`;
+  }
+
+  function renderHubRequests() {
+    const needs = requests.filter(r => r.status === 'pending' || r.status === 'on_hold').slice().sort((a, b) => a.seq - b.seq);
+    const done = requests.filter(r => r.status === 'dispatched' || r.status === 'received').slice().sort((a, b) => b.seq - a.seq);
+    document.getElementById('hubNeedsAction').innerHTML = needs.length
+      ? needs.map(r => ticketCard(r, { hubActions: true })).join('')
+      : `<p class="empty-note">All caught up — nothing waiting on dispatch.</p>`;
+    document.getElementById('hubCompleted').innerHTML = done.length
+      ? done.map(r => ticketCard(r, {})).join('')
+      : `<p class="empty-note">Nothing dispatched yet today.</p>`;
+  }
+
+  function renderHubSkuTable() {
+    document.getElementById('hubSkuTable').innerHTML = skus.map(s => `
+      <div class="sku-table-row">
+        <div class="field field-name">${esc(s.name)}</div>
+        <div class="field field-meta"><span class="field-label">Category</span>${esc(s.category)}</div>
+        <div class="field field-meta"><span class="field-label">Unit</span>${esc(s.unit)}</div>
+        <div class="field field-status">
+          <select class="status-select" onchange="setSkuStatus('${s.id}', this.value)">
+            <option value="in_stock" ${s.status === 'in_stock' ? 'selected' : ''}>In Stock</option>
+            <option value="in_process" ${s.status === 'in_process' ? 'selected' : ''}>In Process</option>
+            <option value="out_of_stock" ${s.status === 'out_of_stock' ? 'selected' : ''}>Out of Stock</option>
+          </select>
+        </div>
+      </div>`).join('');
+  }
+
+  function setSkuStatus(id, status) {
+    const s = findSku(id);
+    if (!s) return;
+    s.status = status;
+    if (status !== 'in_stock') {
+      STORES.forEach(store => { delete carts[store.id][id]; });
     }
+    renderAll();
+  }
 
-    // ── Render: Order Form (Store) ────────────────────────
-    function renderOrderForm() {
-      const skus = load(KEYS.skus);
-      $('order-form').innerHTML = skus.map(sku => {
-        const inStock = sku.status === 'In Stock';
-        return `
-          <div class="card-lift flex items-center justify-between rounded-xl p-3 border ${inStock ? 'bg-white border-gray-100' : 'bg-gray-50 border-gray-100 opacity-50'}">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-9 h-9 rounded-lg flex items-center justify-center text-lg shrink-0 ${inStock ? 'bg-brand-50' : 'bg-gray-100'}">
-                ${inStock ? '📦' : '🚫'}
-              </div>
-              <div class="min-w-0">
-                <p class="text-sm font-semibold text-gray-800 truncate">${sku.name}</p>
-                <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider mt-0.5 ${inStock ? 'text-emerald-600' : 'text-red-500'}">
-                  <span class="w-1.5 h-1.5 rounded-full ${inStock ? 'bg-emerald-500' : 'bg-red-500'}"></span>
-                  ${sku.status}
-                </span>
-              </div>
-            </div>
-            ${inStock ? `
-              <input type="number" min="0" value="0" data-order-sku="${sku.id}"
-                class="w-16 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-center font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400 transition" />
-            ` : `
-              <span class="text-[10px] font-bold text-red-400 bg-red-50 px-2.5 py-1 rounded-full">Unavailable</span>
-            `}
-          </div>`;
-      }).join('');
-    }
+  // ---------------------------------------------------------------
+  // Add SKU modal
+  // ---------------------------------------------------------------
+  function openAddSku() {
+    document.getElementById('addSkuModal').classList.remove('hidden');
+    document.getElementById('newSkuName').focus();
+  }
+  function closeAddSku() {
+    document.getElementById('addSkuModal').classList.add('hidden');
+    document.getElementById('newSkuName').value = '';
+    document.getElementById('newSkuCategory').value = '';
+    document.getElementById('newSkuUnit').value = '';
+    document.getElementById('newSkuStatus').value = 'in_stock';
+  }
+  function confirmAddSku() {
+    const nameEl = document.getElementById('newSkuName');
+    const name = nameEl.value.trim();
+    if (!name) { nameEl.focus(); return; }
+    const category = document.getElementById('newSkuCategory').value.trim() || 'General';
+    const unit = document.getElementById('newSkuUnit').value.trim() || 'pack';
+    const status = document.getElementById('newSkuStatus').value;
+    newSkuCounter += 1;
+    skus.push({ id: 'sku-custom-' + newSkuCounter, name, category, unit, status });
+    closeAddSku();
+    renderAll();
+    flashNote('hubFlash', `${name} added to the catalog.`);
+  }
 
-    // ── Render: Incoming Dispatches (Store) ────────────────
-    function renderIncomingDispatches() {
-      const orders = load(KEYS.orders);
-      const storeId = $('store-selector').value;
-      const dispatched = orders.filter(o => o.storeId === storeId && o.status === 'dispatched');
-      $('incoming-count').textContent = dispatched.length;
-      $('incoming-count').style.display = dispatched.length ? '' : 'none';
+  // ---------------------------------------------------------------
+  // Wire up + initial render
+  // ---------------------------------------------------------------
+  document.getElementById('storeSelect').addEventListener('change', e => {
+    currentStoreId = e.target.value;
+    renderAll();
+  });
+  document.querySelectorAll('.view-toggle button').forEach(b => {
+    b.addEventListener('click', () => setView(b.dataset.view));
+  });
+  document.getElementById('submitRequestBtn').addEventListener('click', submitRequest);
+  document.getElementById('addSkuBtn').addEventListener('click', openAddSku);
+  document.getElementById('cancelAddSku').addEventListener('click', closeAddSku);
+  document.getElementById('confirmAddSku').addEventListener('click', confirmAddSku);
+  document.getElementById('addSkuModal').addEventListener('click', e => {
+    if (e.target.id === 'addSkuModal') closeAddSku();
+  });
 
-      if (dispatched.length === 0) {
-        $('incoming-dispatches').innerHTML = `
-          <div class="text-center py-8 text-gray-300">
-            <div class="text-3xl mb-2">📭</div>
-            <p class="text-xs font-medium">No incoming dispatches</p>
-          </div>`;
-        return;
-      }
-
-      $('incoming-dispatches').innerHTML = dispatched.map(order => {
-        const timeStr = new Date(order.dispatchedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        const itemRows = order.items.map(item => {
-          const short = item.qtyDispatched < item.qtyOrdered;
-          return `
-            <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-              <p class="text-xs font-medium text-gray-700 truncate">${item.skuName}</p>
-              <div class="flex items-center gap-3 text-[11px] shrink-0">
-                <span class="text-gray-400">Ord: <span class="font-bold text-gray-600">${item.qtyOrdered}</span></span>
-                <span class="${short ? 'text-red-500' : 'text-emerald-600'}">Disp: <span class="font-bold">${item.qtyDispatched}</span></span>
-                ${short ? '<span class="text-[9px] font-bold text-red-400 bg-red-50 px-1.5 py-0.5 rounded-full">SHORT</span>' : ''}
-              </div>
-            </div>`;
-        }).join('');
-
-        return `
-          <div class="bg-white rounded-2xl border border-green-200 shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-2.5 flex items-center justify-between">
-              <div>
-                <p class="text-xs font-bold text-green-800">🚚 Dispatched from Hub</p>
-                <p class="text-[10px] text-green-600/70 mt-0.5">${timeStr}</p>
-              </div>
-              <span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full uppercase tracking-wider">In Transit</span>
-            </div>
-            <div class="px-4 py-2">${itemRows}</div>
-            <div class="px-4 pb-3">
-              <button onclick="receiveOrder('${order.id}')"
-                class="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white text-xs font-bold py-2.5 rounded-xl shadow-md shadow-emerald-600/25 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                Mark Received
-              </button>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    // ── Render: Completed Orders (Store) ──────────────────
-    function renderCompletedOrders() {
-      const orders = load(KEYS.orders);
-      const storeId = $('store-selector').value;
-      const completed = orders.filter(o => o.storeId === storeId && o.status === 'received');
-
-      if (completed.length === 0) {
-        $('completed-orders').innerHTML = `
-          <div class="text-center py-6 text-gray-300">
-            <p class="text-xs font-medium">No completed orders</p>
-          </div>`;
-        return;
-      }
-
-      $('completed-orders').innerHTML = completed.slice().reverse().map(order => {
-        const timeStr = new Date(order.receivedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        const itemSummary = order.items.map(i => `${i.skuName} ×${i.qtyDispatched}`).join(', ');
-        return `
-          <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
-            <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-sm shrink-0">✅</div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between">
-                <p class="text-xs font-bold text-gray-700">Order ${order.id.slice(-5).toUpperCase()}</p>
-                <span class="text-[10px] text-gray-400">${timeStr}</span>
-              </div>
-              <p class="text-[11px] text-gray-500 mt-1 truncate">${itemSummary}</p>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    // ── Render: Store View (combined) ─────────────────────
-    function renderStoreView() {
-      renderOrderForm();
-      renderIncomingDispatches();
-      renderCompletedOrders();
-    }
-
-    // ── Render All ────────────────────────────────────────
-    function renderAll() {
-      if (currentView === 'hub') {
-        renderCatalog();
-        renderPendingOrders();
-        renderDispatchHistory();
-      } else {
-        renderStoreView();
-      }
-    }
-
-    // ── Init ──────────────────────────────────────────────
-    seedIfEmpty();
-    switchView('hub');
-
-    // Re-position indicator on resize
-    window.addEventListener('resize', () => switchView(currentView));
-  </script>
+  renderAll();
+</script>
 </body>
 </html>
