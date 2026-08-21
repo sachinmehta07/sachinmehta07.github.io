@@ -222,7 +222,7 @@
 
   /* ---------- Hub: SKU catalog table ---------- */
   .sku-table-head, .sku-table-row {
-    display: grid; grid-template-columns: 2fr 1fr 1fr 1.3fr; gap: 12px; align-items: center; padding: 10px 14px;
+    display: grid; grid-template-columns: 2.2fr 1fr .7fr .7fr 1.5fr; gap: 10px; align-items: center; padding: 10px 14px;
   }
   .sku-table-head { font-family: var(--font-display); text-transform: uppercase; font-size: 11px; letter-spacing: .05em; color: var(--ink-soft); border-bottom: 1.5px solid var(--ink); }
   .sku-table-row { border-bottom: 1px solid var(--card-line); }
@@ -233,6 +233,12 @@
     font-weight: 600; font-size: 13px; padding: 6px 8px; border-radius: 6px;
     border: 1.5px solid var(--card-line); background: var(--card); width: 100%; cursor: pointer;
   }
+  .stock-input {
+    width: 100%; padding: 6px 8px; border: 1.5px solid var(--card-line); border-radius: 6px;
+    font-family: var(--font-mono); font-weight: 600; font-size: 13px; text-align: center;
+    color: var(--ink); background: var(--card);
+  }
+  .stock-input:focus { border-color: var(--accent); outline: none; }
   .delete-btn {
     background: none; border: 1.5px solid var(--card-line); border-radius: 6px;
     color: var(--ink-soft); cursor: pointer; font-size: 13px; padding: 5px 10px;
@@ -240,12 +246,22 @@
   }
   .delete-btn:hover { border-color: var(--bad); color: var(--bad); background: var(--bad-bg); }
 
-  @media (max-width: 620px) {
+  .sku-stock-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+  }
+  .sku-stock-tag.stock-good { color: var(--good); background: var(--good-bg); }
+  .sku-stock-tag.stock-low  { color: var(--hold);  background: var(--hold-bg); }
+  .sku-stock-tag.stock-zero { color: var(--bad);   background: var(--bad-bg); }
+
+  @media (max-width: 720px) {
     .sku-table-head { display: none; }
     .sku-table-row { grid-template-columns: 1fr 1fr; row-gap: 6px; padding: 12px 14px; }
     .field-name { grid-column: 1 / -1; }
     .field-meta .field-label { display: inline; color: var(--ink-soft); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; margin-right: 4px; }
     .field-status { grid-column: 1 / -1; }
+    .field-stock { grid-column: 1 / -1; }
   }
 
   /* ---------- Modal ---------- */
@@ -382,7 +398,7 @@
           <button type="button" class="btn btn-accent" id="addSkuBtn">+ Add SKU</button>
         </div>
         <div class="sku-table-head">
-          <span>Item</span><span>Category</span><span>Unit</span><span>Status / Actions</span>
+          <span>Item</span><span>Category</span><span>Unit</span><span>Stock</span><span>Status / Actions</span>
         </div>
         <div id="hubSkuTable"></div>
         <span class="flash-note" id="hubFlash"></span>
@@ -409,13 +425,18 @@
           <input type="text" id="newSkuUnit" placeholder="e.g. pack" maxlength="20">
         </label>
       </div>
-      <label class="field-block">Starting status
-        <select id="newSkuStatus">
-          <option value="in_stock">In Stock</option>
-          <option value="low_stock">Low Stock</option>
-          <option value="out_of_stock">Out of Stock</option>
-        </select>
-      </label>
+      <div class="modal-row">
+        <label class="field-block">Stock quantity
+          <input type="number" id="newSkuStock" placeholder="e.g. 50" min="0" value="50">
+        </label>
+        <label class="field-block">Starting status
+          <select id="newSkuStatus">
+            <option value="in_stock">In Stock</option>
+            <option value="low_stock">Low Stock</option>
+            <option value="out_of_stock">Out of Stock</option>
+          </select>
+        </label>
+      </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" id="cancelAddSku">Cancel</button>
         <button type="button" class="btn btn-accent" id="confirmAddSku">Add SKU</button>
@@ -454,21 +475,21 @@
   };
 
   const SEED_SKUS = [
-    { id: 'masala-peanuts',   name: 'Masala Peanuts 200g',     category: 'Namkeens',    unit: 'pack',   status: 'in_stock' },
-    { id: 'bhujia-sev',      name: 'Bhujia Sev 500g',         category: 'Namkeens',    unit: 'pack',   status: 'in_stock' },
-    { id: 'aloo-bhujia',     name: 'Aloo Bhujia 400g',        category: 'Namkeens',    unit: 'pack',   status: 'low_stock' },
-    { id: 'mixture',         name: 'Navratna Mixture 300g',    category: 'Namkeens',    unit: 'pack',   status: 'in_stock' },
-    { id: 'choco-chip',      name: 'Choco-Chip Cookies',      category: 'Cookies',     unit: 'pack',   status: 'in_stock' },
-    { id: 'cream-biscuit',   name: 'Cream Biscuit Orange',    category: 'Cookies',     unit: 'pack',   status: 'in_stock' },
-    { id: 'butter-cookies',  name: 'Butter Cookies Tin',      category: 'Cookies',     unit: 'tin',    status: 'out_of_stock' },
-    { id: 'dairy-milk',      name: 'Dairy Milk Silk 150g',    category: 'Chocolates',  unit: 'bar',    status: 'in_stock' },
-    { id: 'kitkat',          name: 'KitKat 4-Finger',         category: 'Chocolates',  unit: 'pack',   status: 'in_stock' },
-    { id: 'five-star',       name: '5 Star 40g (box of 24)',  category: 'Chocolates',  unit: 'box',    status: 'in_stock' },
-    { id: 'mango-juice',     name: 'Mango Juice 1L',          category: 'Beverages',   unit: 'bottle', status: 'in_stock' },
-    { id: 'cola-can',        name: 'Cola Can 300ml',          category: 'Beverages',   unit: 'can',    status: 'in_stock' },
-    { id: 'mineral-water',   name: 'Mineral Water 500ml',     category: 'Beverages',   unit: 'bottle', status: 'in_stock' },
-    { id: 'instant-noodles', name: 'Instant Noodles (4-pk)',  category: 'Snacks',      unit: 'pack',   status: 'low_stock' },
-    { id: 'potato-chips',    name: 'Potato Chips Classic',    category: 'Snacks',      unit: 'pack',   status: 'in_stock' },
+    { id: 'masala-peanuts',   name: 'Masala Peanuts 200g',     category: 'Namkeens',    unit: 'pack',   stock: 120, status: 'in_stock' },
+    { id: 'bhujia-sev',      name: 'Bhujia Sev 500g',         category: 'Namkeens',    unit: 'pack',   stock: 80,  status: 'in_stock' },
+    { id: 'aloo-bhujia',     name: 'Aloo Bhujia 400g',        category: 'Namkeens',    unit: 'pack',   stock: 8,   status: 'low_stock' },
+    { id: 'mixture',         name: 'Navratna Mixture 300g',    category: 'Namkeens',    unit: 'pack',   stock: 45,  status: 'in_stock' },
+    { id: 'choco-chip',      name: 'Choco-Chip Cookies',      category: 'Cookies',     unit: 'pack',   stock: 60,  status: 'in_stock' },
+    { id: 'cream-biscuit',   name: 'Cream Biscuit Orange',    category: 'Cookies',     unit: 'pack',   stock: 35,  status: 'in_stock' },
+    { id: 'butter-cookies',  name: 'Butter Cookies Tin',      category: 'Cookies',     unit: 'tin',    stock: 0,   status: 'out_of_stock' },
+    { id: 'dairy-milk',      name: 'Dairy Milk Silk 150g',    category: 'Chocolates',  unit: 'bar',    stock: 90,  status: 'in_stock' },
+    { id: 'kitkat',          name: 'KitKat 4-Finger',         category: 'Chocolates',  unit: 'pack',   stock: 55,  status: 'in_stock' },
+    { id: 'five-star',       name: '5 Star 40g (box of 24)',  category: 'Chocolates',  unit: 'box',    stock: 20,  status: 'in_stock' },
+    { id: 'mango-juice',     name: 'Mango Juice 1L',          category: 'Beverages',   unit: 'bottle', stock: 40,  status: 'in_stock' },
+    { id: 'cola-can',        name: 'Cola Can 300ml',          category: 'Beverages',   unit: 'can',    stock: 100, status: 'in_stock' },
+    { id: 'mineral-water',   name: 'Mineral Water 500ml',     category: 'Beverages',   unit: 'bottle', stock: 200, status: 'in_stock' },
+    { id: 'instant-noodles', name: 'Instant Noodles (4-pk)',  category: 'Snacks',      unit: 'pack',   stock: 5,   status: 'low_stock' },
+    { id: 'potato-chips',    name: 'Potato Chips Classic',    category: 'Snacks',      unit: 'pack',   stock: 75,  status: 'in_stock' },
   ];
 
   // ---------------------------------------------------------------
@@ -479,6 +500,13 @@
   function loadState() {
     const savedSkus = localStorage.getItem(LS_SKUS);
     skus = savedSkus ? JSON.parse(savedSkus) : JSON.parse(JSON.stringify(SEED_SKUS));
+
+    // Migrate: backfill stock for SKUs saved before this field existed
+    skus.forEach(s => {
+      if (typeof s.stock !== 'number') {
+        s.stock = s.status === 'out_of_stock' ? 0 : s.status === 'low_stock' ? 5 : 50;
+      }
+    });
 
     const savedReqs = localStorage.getItem(LS_REQUESTS);
     if (savedReqs) {
@@ -585,6 +613,8 @@
     grid.innerHTML = skus.map(s => {
       const qty = cart[s.id] || 0;
       const orderable = s.status === 'in_stock' || s.status === 'low_stock';
+      const stockNum = typeof s.stock === 'number' ? s.stock : '—';
+      const stockCls = s.stock === 0 ? 'stock-zero' : s.stock <= 10 ? 'stock-low' : 'stock-good';
       return `
       <div class="sku-card ${orderable ? '' : 'is-disabled'}">
         <div class="sku-top">
@@ -592,7 +622,10 @@
           ${badgeHtml(SKU_STATUS, s.status)}
         </div>
         <div class="sku-name">${esc(s.name)}</div>
-        <div class="sku-unit">per ${esc(s.unit)}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+          <span class="sku-unit">per ${esc(s.unit)}</span>
+          <span class="sku-stock-tag ${stockCls}">Stock: ${stockNum}</span>
+        </div>
         ${orderable ? `
           <div class="qty-stepper">
             <button type="button" class="qty-btn" onclick="changeQty('${s.id}', -1)" aria-label="Decrease">−</button>
@@ -849,11 +882,17 @@
   // HUB: SKU table
   // ---------------------------------------------------------------
   function renderHubSkuTable() {
-    document.getElementById('hubSkuTable').innerHTML = skus.map(s => `
+    document.getElementById('hubSkuTable').innerHTML = skus.map(s => {
+      const stockVal = typeof s.stock === 'number' ? s.stock : 0;
+      return `
       <div class="sku-table-row">
         <div class="field field-name">${esc(s.name)}</div>
         <div class="field field-meta"><span class="field-label">Cat </span>${esc(s.category)}</div>
         <div class="field field-meta"><span class="field-label">Unit </span>${esc(s.unit)}</div>
+        <div class="field field-stock"><span class="field-label">Stock </span>
+          <input type="number" class="stock-input" min="0" value="${stockVal}"
+                 onchange="setSkuStock('${s.id}', this.value)" aria-label="Stock for ${esc(s.name)}" />
+        </div>
         <div class="field field-status" style="display:flex;gap:6px;align-items:center;">
           <select class="status-select" onchange="setSkuStatus('${s.id}', this.value)" style="flex:1;">
             <option value="in_stock" ${s.status === 'in_stock' ? 'selected' : ''}>In Stock</option>
@@ -862,7 +901,26 @@
           </select>
           <button type="button" class="delete-btn" onclick="deleteSku('${s.id}')" title="Remove SKU" aria-label="Delete ${esc(s.name)}">✕</button>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
+  }
+
+  function setSkuStock(id, val) {
+    const s = findSku(id);
+    if (!s) return;
+    const num = Math.max(0, parseInt(val, 10) || 0);
+    s.stock = num;
+    // Auto-derive status from stock level
+    if (num === 0) {
+      s.status = 'out_of_stock';
+      STORES.forEach(store => { delete carts[store.id][id]; });
+    } else if (num <= 10) {
+      s.status = 'low_stock';
+    } else {
+      s.status = 'in_stock';
+    }
+    persist();
+    renderAll();
   }
 
   function setSkuStatus(id, status) {
@@ -870,6 +928,7 @@
     if (!s) return;
     s.status = status;
     if (status === 'out_of_stock') {
+      s.stock = 0;
       STORES.forEach(store => { delete carts[store.id][id]; });
     }
     persist();
@@ -897,6 +956,7 @@
     document.getElementById('newSkuName').value = '';
     document.getElementById('newSkuCategory').value = '';
     document.getElementById('newSkuUnit').value = '';
+    document.getElementById('newSkuStock').value = '50';
     document.getElementById('newSkuStatus').value = 'in_stock';
   }
   function confirmAddSku() {
@@ -905,13 +965,14 @@
     if (!name) { nameEl.focus(); return; }
     const category = document.getElementById('newSkuCategory').value.trim() || 'General';
     const unit = document.getElementById('newSkuUnit').value.trim() || 'pack';
+    const stock = Math.max(0, parseInt(document.getElementById('newSkuStock').value, 10) || 0);
     const status = document.getElementById('newSkuStatus').value;
     const id = 'sku-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-    skus.push({ id, name, category, unit, status });
+    skus.push({ id, name, category, unit, stock, status });
     closeAddSku();
     persist();
     renderAll();
-    flashNote('hubFlash', `${name} added to the catalog.`);
+    flashNote('hubFlash', `${name} added to the catalog (stock: ${stock}).`);
   }
 
   // ---------------------------------------------------------------
