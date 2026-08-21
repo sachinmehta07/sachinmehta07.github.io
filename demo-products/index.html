@@ -641,10 +641,32 @@
     const s = findSku(skuId);
     if (!s || s.status === 'out_of_stock') return;
     const cart = carts[currentStoreId];
-    const next = Math.max(0, (cart[skuId] || 0) + delta);
+    const current = cart[skuId] || 0;
+
+    if (delta > 0 && s.stock <= 0) return;           // nothing left to add
+    const next = Math.max(0, current + delta);
+    const actualDelta = next - current;               // +1 or -1 or 0
+
+    // Update stock live
+    s.stock = Math.max(0, s.stock - actualDelta);
+    syncStatusFromStock(s);
+
     if (next === 0) delete cart[skuId]; else cart[skuId] = next;
+    persist();
     renderSkuGrid();
     renderCart();
+  }
+
+  // Keep status in sync with stock level
+  function syncStatusFromStock(s) {
+    if (s.stock === 0) {
+      s.status = 'out_of_stock';
+    } else if (s.stock <= 10) {
+      s.status = 'low_stock';
+    } else if (s.status === 'out_of_stock' || s.status === 'low_stock') {
+      // only auto-promote, never demote from a manual "in_stock"
+      s.status = 'in_stock';
+    }
   }
 
   // ---------------------------------------------------------------
@@ -672,7 +694,16 @@
   }
 
   function removeFromCart(skuId) {
-    delete carts[currentStoreId][skuId];
+    const cart = carts[currentStoreId];
+    const qty = cart[skuId] || 0;
+    // Restore stock
+    const s = findSku(skuId);
+    if (s && qty > 0) {
+      s.stock += qty;
+      syncStatusFromStock(s);
+    }
+    delete cart[skuId];
+    persist();
     renderSkuGrid();
     renderCart();
   }
@@ -685,6 +716,7 @@
     entries.forEach(([skuId, qty]) => { itemsObj[skuId] = qty; });
     const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     requests.push(mkReq(currentStoreId, itemsObj, 'pending', time));
+    // Stock already decremented — just clear the cart
     carts[currentStoreId] = {};
     persist();
     renderAll();
@@ -910,14 +942,9 @@
     if (!s) return;
     const num = Math.max(0, parseInt(val, 10) || 0);
     s.stock = num;
-    // Auto-derive status from stock level
+    syncStatusFromStock(s);
     if (num === 0) {
-      s.status = 'out_of_stock';
       STORES.forEach(store => { delete carts[store.id][id]; });
-    } else if (num <= 10) {
-      s.status = 'low_stock';
-    } else {
-      s.status = 'in_stock';
     }
     persist();
     renderAll();
